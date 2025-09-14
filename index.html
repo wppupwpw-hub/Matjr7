@@ -3,1322 +3,537 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متجر الأناقة - ملابس وأحذية عصرية</title>
+    <title>شاهد واربح</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for a clean font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
+            font-family: 'Cairo', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
+        /* Custom scrollbar style for the wallet details */
+        .wallet-details-container::-webkit-scrollbar {
+            width: 8px;
         }
-
-        /* Login Page Styles */
-        .login-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 2rem;
+        .wallet-details-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
         }
-
-        .login-card {
-            background: rgba(255, 255, 255, 0.95);
+        .wallet-details-container::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        .wallet-details-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .glass-effect {
             backdrop-filter: blur(20px);
-            border-radius: 30px;
-            padding: 3rem;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            max-width: 450px;
-            width: 100%;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .login-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(102, 126, 234, 0.1), transparent);
-            animation: shimmer 3s infinite;
-            pointer-events: none;
-        }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-        }
-
-        .login-logo {
-            font-size: 3rem;
-            font-weight: bold;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 1rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .login-title {
-            font-size: 1.8rem;
-            color: #333;
-            margin-bottom: 0.5rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .login-subtitle {
-            color: #666;
-            margin-bottom: 2.5rem;
-            font-size: 1rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .g_id_signin {
-            margin: 0 auto 1.5rem;
-        }
-
-        .input-group {
-            margin-bottom: 1rem;
-            text-align: right;
-        }
-        
-        .input-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #555;
-            font-weight: 500;
-        }
-        
-        .input-group input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #ddd;
-            border-radius: 15px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-        }
-        
-        .input-group input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        .login-button {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 50px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 500;
-            width: 100%;
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 1;
-            margin-top: 1.5rem;
-        }
-        
-        .login-button:hover {
-            background: linear-gradient(45deg, #5a67d8, #68466d);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-        }
-
-        .divider {
-            margin: 1.5rem 0;
-            position: relative;
-            color: #999;
-            font-size: 0.9rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .divider::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: #ddd;
-            z-index: -1;
-        }
-
-        .divider span {
             background: rgba(255, 255, 255, 0.95);
-            padding: 0 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-
-        .error-message {
-            color: #ff4757;
-            font-size: 0.9rem;
-            margin-top: 1rem;
-            text-align: center;
-        }
-
-        .toggle-btn {
-            background: none;
-            border: none;
-            color: #667eea;
-            cursor: pointer;
-            font-weight: 600;
-            margin-top: 1rem;
-        }
-        
-        .toggle-btn:hover {
-            text-decoration: underline;
-        }
-
-        .form-container {
-            display: none;
-            animation: fadeIn 0.5s ease-in-out;
-        }
-        
-        .form-container.active {
-            display: block;
-        }
-        
-        .names-group {
-            display: flex;
-            gap: 1rem;
-            width: 100%;
-        }
-
-        .names-group .input-group {
-            flex-grow: 1;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* Store Styles */
-        .store-container {
-            display: none;
-        }
-
-        .store-container.show {
-            display: block;
-        }
-
-        .upload-container {
-            display: none;
-            padding: 2rem;
-            background: rgba(255, 255, 255, 0.95);
-            margin: 2rem;
-            border-radius: 30px;
-            backdrop-filter: blur(10px);
-        }
-
-        .upload-container h2 {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .upload-form .input-group {
-            text-align: right;
-            margin-bottom: 1.5rem;
-        }
-
-        .upload-form .input-group input,
-        .upload-form .input-group textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #ddd;
-            border-radius: 15px;
-            font-size: 1rem;
-        }
-        
-        .upload-form .input-group textarea {
-            min-height: 100px;
-        }
-
-        .upload-form select {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #ddd;
-            border-radius: 15px;
-            font-size: 1rem;
-        }
-
-        .upload-button {
-            background: linear-gradient(45deg, #28a745, #1d9d3d);
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 50px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 500;
-            width: 100%;
-            transition: all 0.3s ease;
-        }
-        
-        .upload-button:hover {
-            background: linear-gradient(45deg, #218838, #168128);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(40, 167, 69, 0.4);
-        }
-
-        /* User Info */
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            color: #333;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 2px solid #667eea;
-        }
-
-        .user-name {
-            font-weight: 500;
-        }
-
-        .logout-btn {
-            background: #ff4757;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-
-        .logout-btn:hover {
-            background: #ff3742;
-            transform: translateY(-1px);
-        }
-
-        /* Header */
-        header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            border-radius: 0 0 20px 20px;
-        }
-
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 0;
-        }
-
-        .logo {
-            font-size: 2rem;
-            font-weight: bold;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: #333;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            padding: 0.5rem 1rem;
-            border-radius: 25px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .nav-links a.active {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .nav-links a:hover {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-        }
-
-        .cart-icon {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            padding: 0.7rem;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .cart-icon:hover {
-            transform: scale(1.1);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .cart-count {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #ff4757;
-            color: white;
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
             border-radius: 50%;
             width: 20px;
             height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-
-        /* Hero Section */
-        .hero {
-            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
-                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><rect fill="%23667eea" width="1200" height="800"/><circle cx="200" cy="200" r="100" fill="%23764ba2" opacity="0.3"/><circle cx="1000" cy="600" r="150" fill="%23667eea" opacity="0.4"/></svg>');
-            background-size: cover;
-            background-position: center;
-            color: white;
-            text-align: center;
-            padding: 8rem 0;
-            margin: 2rem;
-            border-radius: 30px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, rgba(102, 126, 234, 0.8), rgba(118, 75, 162, 0.8));
-            z-index: 1;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-        }
-
-        .hero h1 {
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            animation: fadeInUp 1s ease;
-        }
-
-        .hero p {
-            font-size: 1.3rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
-            animation: fadeInUp 1s ease 0.3s both;
-        }
-
-        .cta-button {
-            background: linear-gradient(45deg, #ff4757, #ff3742);
-            color: white;
-            padding: 1rem 2rem;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: bold;
+            animation: spin 1s linear infinite;
             display: inline-block;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4);
-            animation: fadeInUp 1s ease 0.6s both;
+            margin-left: 8px;
         }
-
-        .cta-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(255, 71, 87, 0.6);
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-
-        /* Products Section */
-        .products {
-            padding: 4rem 0;
-            background: rgba(255, 255, 255, 0.95);
-            margin: 2rem;
-            border-radius: 30px;
-            backdrop-filter: blur(10px);
+        .success-animation {
+            animation: successPulse 0.6s ease-in-out;
         }
-
-        .section-title {
-            text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 3rem;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+        @keyframes successPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
-
-        .product-categories {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-bottom: 3rem;
-            flex-wrap: wrap;
+        .error-shake {
+            animation: shake 0.5s ease-in-out;
         }
-
-        .category-btn {
-            padding: 0.7rem 1.5rem;
-            border: none;
-            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
-            color: #333;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-
-        .category-btn.active,
-        .category-btn:hover {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .product-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-            padding: 0 1rem;
-        }
-
-        .product-card {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            transform: translateY(0);
-        }
-
-        .product-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-        }
-
-        .product-image {
-            height: 250px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .product-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .product-info {
-            padding: 1.5rem;
-        }
-
-        .product-title {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-            color: #333;
-        }
-
-        .product-price {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 1rem;
-        }
-
-        .product-description {
-            color: #666;
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-        }
-
-        .add-to-cart {
-            width: 100%;
-            padding: 0.8rem;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .add-to-cart:hover {
-            background: linear-gradient(45deg, #5a67d8, #68466d);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Footer */
-        footer {
-            background: rgba(0, 0, 0, 0.9);
-            color: white;
-            text-align: center;
-            padding: 3rem 0;
-            margin: 2rem;
-            border-radius: 30px;
-        }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .footer-section h3 {
-            margin-bottom: 1rem;
-            color: #667eea;
-        }
-
-        .footer-section p,
-        .footer-section a {
-            color: #ccc;
-            text-decoration: none;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-
-        .footer-section a:hover {
-            color: #667eea;
-        }
-
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Mobile Responsiveness */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-            
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-            
-            .hero p {
-                font-size: 1.1rem;
-            }
-            
-            .product-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .user-info {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-
-            .nav-right {
-                flex-direction: column;
-                gap: 1rem;
-            }
-        }
-
-        /* Cart Modal */
-        .cart-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 2000;
-        }
-
-        .cart-content {
-            background: white;
-            margin: 5% auto;
-            padding: 2rem;
-            border-radius: 20px;
-            max-width: 500px;
-            position: relative;
-        }
-
-        .close-cart {
-            position: absolute;
-            top: 1rem;
-            right: 1.5rem;
-            font-size: 2rem;
-            cursor: pointer;
-            color: #999;
-        }
-
-        .close-cart:hover {
-            color: #333;
-        }
-
-        .upload-product-button {
-            background: linear-gradient(45deg, #17a2b8, #138496);
-            color: white;
-            border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            margin-right: 1rem;
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
         }
     </style>
 </head>
-<body>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <!-- Login screen -->
+    <div id="login-screen" class="glass-effect flex flex-col items-center justify-center text-center p-8 rounded-2xl shadow-2xl w-full max-w-sm">
+        <h1 class="text-4xl font-extrabold text-blue-600 mb-4">أهلاً بك في شاهد واربح!</h1>
+        <p class="text-lg text-gray-600 mb-8">قم بتسجيل الدخول أو أنشئ حسابًا جديدًا.</p>
+        
+        <!-- Google Sign-in Button -->
+        <div id="g_id_onload" 
+             data-client_id=""
+             data-callback="handleCredentialResponse"
+             data-auto_prompt="false">
+        </div>
+        <div class="g_id_signin mb-4" 
+             data-type="standard" 
+             data-size="large" 
+             data-theme="outline" 
+             data-text="signin_with"
+             data-shape="rectangular"
+             data-logo_alignment="left"
+             data-width="300">
+        </div>
+
+        <div class="relative w-full text-center my-4">
+            <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-gray-300"></div>
+            </div>
+            <div class="relative inline-block px-4 bg-white text-gray-500 text-sm">أو</div>
+        </div>
+        
+        <div class="w-full flex flex-col gap-4 mb-4">
+            <input id="email-input" type="email" placeholder="البريد الإلكتروني" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200">
+            <input id="password-input" type="password" placeholder="كلمة المرور" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200">
+        </div>
+
+        <button id="email-signin-button" class="w-full flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-50 shadow-lg mb-4">
+            <span id="signin-text">تسجيل الدخول</span>
+            <div id="signin-spinner" class="loading-spinner hidden"></div>
+        </button>
+
+        <button id="signup-button" class="w-full flex items-center justify-center bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-green-300 focus:ring-opacity-50 shadow-lg">
+            إنشاء حساب جديد
+        </button>
+
+        <p id="auth-status-message" class="mt-4 text-sm text-gray-600 h-5"></p>
+    </div>
+
+    <!-- Signup Popup -->
+    <div id="signup-popup" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div class="glass-effect p-8 rounded-2xl shadow-2xl w-full max-w-sm text-center">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold text-green-600">إنشاء حساب جديد</h2>
+                <button id="close-signup-popup" class="text-gray-400 hover:text-gray-600 transition-all duration-300 transform hover:scale-125 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div class="w-full flex flex-col gap-4 mb-4">
+                <input id="name-signup-input" type="text" placeholder="الاسم الكامل" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200">
+                <input id="email-signup-input" type="email" placeholder="البريد الإلكتروني" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200">
+                <input id="password-signup-input" type="password" placeholder="كلمة المرور (6 أحرف على الأقل)" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200">
+                <input id="confirm-password-input" type="password" placeholder="تأكيد كلمة المرور" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200">
+            </div>
+            
+            <!-- Terms and Conditions -->
+            <div class="flex items-center mb-4">
+                <input id="terms-checkbox" type="checkbox" class="mr-2 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                <label for="terms-checkbox" class="text-sm text-gray-700">أوافق على <a href="#" class="text-green-600 underline">الشروط والأحكام</a></label>
+            </div>
+            
+            <button id="confirm-signup-button" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-green-300 focus:ring-opacity-50 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                <span id="signup-text">إنشاء حساب</span>
+                <div id="signup-spinner" class="loading-spinner hidden"></div>
+            </button>
+            <p id="signup-status-message" class="mt-4 text-sm text-gray-600 h-5"></p>
+        </div>
+    </div>
+
+    <!-- Main Card Container (initially hidden) -->
+    <div id="main-app" class="hidden glass-effect p-8 rounded-2xl shadow-2xl text-center w-full max-w-md">
+
+        <!-- Header with Title and Wallet Button -->
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex flex-col items-start">
+                <h1 class="text-4xl font-extrabold text-blue-600">شاهد واربح</h1>
+                <p id="welcome-message" class="text-sm text-gray-600 mt-1">مرحباً بك!</p>
+            </div>
+            <div class="flex gap-2">
+                <button id="wallet-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-50 shadow-lg">
+                    محفظتي
+                </button>
+                <button id="logout-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-300 focus:ring-opacity-50 shadow-lg">
+                    تسجيل الخروج
+                </button>
+            </div>
+        </div>
+
+        <p class="text-gray-600 mb-6">شاهد إعلانات قصيرة واكسب المال بسهولة!</p>
+        
+        <!-- Wallet Details Popup -->
+        <div id="wallet-popup" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
+            <div class="glass-effect p-6 rounded-2xl shadow-2xl w-full max-w-sm text-center">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-2xl font-bold text-blue-600">تفاصيل المحفظة</h2>
+                    <button id="close-wallet-popup" class="text-gray-400 hover:text-gray-600 transition-all duration-300 transform hover:scale-125 focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                
+                <div class="wallet-details-container max-h-64 overflow-y-auto mb-4 p-2 bg-gray-50/30 rounded-lg backdrop-blur-sm">
+                    <div class="bg-blue-50/50 p-4 rounded-xl shadow-inner mb-4 backdrop-blur-sm">
+                        <p class="text-lg font-semibold text-gray-700">رصيدك الحالي:</p>
+                        <p id="balance-popup" class="text-4xl font-extrabold text-green-600 mt-2">$0.00</p>
+                    </div>
+                    <div class="bg-gray-100/50 p-4 rounded-xl shadow-inner backdrop-blur-sm">
+                        <p class="text-sm font-semibold text-gray-700">معرف المستخدم:</p>
+                        <p id="user-id-popup" class="text-sm text-gray-800 mt-2 break-all"></p>
+                        <p class="text-sm font-semibold text-gray-700 mt-2">البريد الإلكتروني:</p>
+                        <p id="user-email-popup" class="text-sm text-gray-800 mt-1 break-all"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Balance Section -->
+        <div class="mb-6 bg-blue-50/30 p-4 rounded-xl shadow-inner backdrop-blur-sm">
+            <p class="text-lg font-semibold text-gray-700">رصيدك الحالي:</p>
+            <p id="balance" class="text-5xl font-extrabold text-green-600 mt-2 transition-all duration-500 ease-in-out transform scale-100">$0.00</p>
+        </div>
+
+        <!-- Ad Placeholder / Video Player -->
+        <div id="ad-container" class="w-full h-48 bg-gray-200/30 rounded-xl overflow-hidden mb-6 flex items-center justify-center shadow-md backdrop-blur-sm">
+            <img id="ad-image" src="https://placehold.co/400x200/e5e7eb/6b7280?text=جاري+التحميل..." alt="Ad Placeholder" class="w-full h-full object-cover rounded-xl">
+        </div>
+        
+        <!-- Action Buttons Container -->
+        <div class="flex flex-col sm:flex-row gap-4">
+            <button id="watch-button" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-50 shadow-lg">
+                شاهد إعلان ($0.01)
+            </button>
+            <button id="skip-button" class="flex-1 bg-gray-400 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-gray-300 focus:ring-opacity-50 shadow-lg">
+                تخطي الإعلان
+            </button>
+        </div>
+
+        <!-- Status Message -->
+        <p id="status-message" class="mt-4 text-sm text-gray-600 h-5"></p>
+
+    </div>
+
+    <!-- Firebase Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { 
-            getAuth, 
-            onAuthStateChanged, 
-            signInWithEmailAndPassword, 
-            createUserWithEmailAndPassword, 
-            updateProfile,
-            signInWithCustomToken, 
-            signInAnonymously,
-            signOut
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { 
-            getFirestore, 
-            doc, 
-            setDoc, 
-            onSnapshot, 
-            collection, 
-            addDoc,
-            query, 
-            where, 
-            getDocs 
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signInWithCustomToken, GoogleAuthProvider, signInWithCredential, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        // Firebase Config and Initialization
+        // =====================================
+        // إعدادات Google Client ID
+        // =====================================
+        // أضف Google Client ID الخاص بك هنا من Google Cloud Console
+        // للحصول على Client ID: https://console.cloud.google.com/
+        // 1. إنشاء مشروع جديد أو اختيار مشروع موجود
+        // 2. تفعيل Google Identity API
+        // 3. إنشاء OAuth 2.0 Client ID من نوع "Web application"
+        // 4. إضافة الدومين الخاص بك إلى "Authorized origins"
+        const GOOGLE_CLIENT_ID = '640635892482-ldefv7a2slqgrq09of42qpme20eumkq9.apps.googleusercontent.com'; // ضع Client ID هنا
+        // =====================================
+        
+        // IMPORTANT: Global variables are provided by the Canvas environment.
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const __initial_auth_token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-        let app, db, auth, userId = null;
-
-        // Initialize Firebase on DOMContentLoaded
-        document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                if (Object.keys(firebaseConfig).length > 0) {
-                    app = initializeApp(firebaseConfig);
-                    auth = getAuth(app);
-                    db = getFirestore(app);
-
-                    if (__initial_auth_token) {
-                         await signInWithCustomToken(auth, __initial_auth_token);
-                    } else {
-                        await signInAnonymously(auth);
-                    }
-                    console.log("Firebase initialized and signed in.");
-                    
-                    onAuthStateChanged(auth, (user) => {
-                        if (user) {
-                            userId = user.uid;
-                            showStore();
-                            setupProductListener();
-                        } else {
-                            userId = null;
-                            showLoginPage();
-                        }
-                    });
-
-                } else {
-                    console.log("Firebase config is missing.");
-                    showLoginPage();
-                }
-            } catch (error) {
-                console.error("Firebase initialization failed:", error);
-                showLoginPage();
-            }
-        });
-
-        // Application State
-        let currentProducts = [];
-        let cart = [];
-        let currentFilter = 'all';
+        // Get the necessary HTML elements
+        const loginScreen = document.getElementById('login-screen');
+        const mainApp = document.getElementById('main-app');
+        const balanceElement = document.getElementById('balance');
+        const walletButton = document.getElementById('wallet-button');
+        const logoutButton = document.getElementById('logout-button');
+        const walletPopup = document.getElementById('wallet-popup');
+        const closeWalletPopup = document.getElementById('close-wallet-popup');
+        const balancePopup = document.getElementById('balance-popup');
+        const userIdPopup = document.getElementById('user-id-popup');
+        const userEmailPopup = document.getElementById('user-email-popup');
+        const welcomeMessage = document.getElementById('welcome-message');
+        const watchButton = document.getElementById('watch-button');
+        const skipButton = document.getElementById('skip-button');
+        const statusMessageElement = document.getElementById('status-message');
+        const authStatusMessageElement = document.getElementById('auth-status-message');
+        const adImageElement = document.getElementById('ad-image');
+        const emailSignInButton = document.getElementById('email-signin-button');
+        const emailInput = document.getElementById('email-input');
+        const passwordInput = document.getElementById('password-input');
         
-        // UI elements
-        const loginPage = document.getElementById('loginPage');
-        const storeContainer = document.getElementById('storeContainer');
-        const uploadContainer = document.getElementById('uploadContainer');
-        const productGrid = document.getElementById('productGrid');
-        const userInfoDiv = document.getElementById('userInfo');
-        const navLinks = document.querySelectorAll('.nav-links a');
-        const cartCountSpan = document.getElementById('cartCount');
-        const cartModal = document.getElementById('cartModal');
-        const cartItemsDiv = document.getElementById('cartItems');
-        const cartTotalDiv = document.getElementById('cartTotal');
-        const loginForm = document.getElementById('loginForm');
-        const registerForm = document.getElementById('registerForm');
-        const productForm = document.getElementById('productForm');
+        // Signup elements
+        const signupButton = document.getElementById('signup-button');
+        const signupPopup = document.getElementById('signup-popup');
+        const closeSignupPopup = document.getElementById('close-signup-popup');
+        const nameSignupInput = document.getElementById('name-signup-input');
+        const emailSignupInput = document.getElementById('email-signup-input');
+        const passwordSignupInput = document.getElementById('password-signup-input');
+        const confirmPasswordInput = document.getElementById('confirm-password-input');
+        const termsCheckbox = document.getElementById('terms-checkbox');
+        const confirmSignupButton = document.getElementById('confirm-signup-button');
+        const signupStatusMessageElement = document.getElementById('signup-status-message');
 
-        // Functions for UI rendering and navigation
-        function showLoginPage() {
-            loginPage.style.display = 'block';
-            storeContainer.style.display = 'none';
-            if (uploadContainer) uploadContainer.style.display = 'none';
-            showLoginForm();
+        // Loading elements
+        const signinSpinner = document.getElementById('signin-spinner');
+        const signinText = document.getElementById('signin-text');
+        const signupSpinner = document.getElementById('signup-spinner');
+        const signupText = document.getElementById('signup-text');
+
+        // Initial state
+        let currentBalance = 0;
+        const watchReward = 0.01;
+        const adDuration = 5000;
+        let isAdPlaying = false;
+        let adTimer = null;
+        let db, auth;
+        let userId, userEmail, userName;
+
+        // Array of placeholder ad images
+        const adImages = [
+            "https://placehold.co/400x200/c7d2fe/3730a3?text=إعلان+1",
+            "https://placehold.co/400x200/bae6fd/0369a1?text=إعلان+2",
+            "https://placehold.co/400x200/d1fae5/065f46?text=إعلان+3"
+        ];
+        let currentAdIndex = 0;
+
+        // Validation functions
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
         }
 
-        function showStore() {
-            loginPage.style.display = 'none';
-            storeContainer.style.display = 'block';
-            if (uploadContainer) uploadContainer.style.display = 'none';
-            updateUserInfo();
-            displayProducts(currentProducts);
-            document.querySelector('.nav-links a[href="#products"]').classList.add('active');
-            if (document.querySelector('.nav-links a[href="#upload"]')) {
-                document.querySelector('.nav-links a[href="#upload"]').classList.remove('active');
-            }
+        function validatePassword(password) {
+            return password.length >= 6;
         }
 
-        function showUploadPage() {
-            if (!userId) {
-                showNotification("يجب عليك تسجيل الدخول لرفع منتجات.");
-                return;
-            }
-            loginPage.style.display = 'none';
-            storeContainer.style.display = 'none';
-            uploadContainer.style.display = 'block';
-            document.querySelector('.nav-links a[href="#upload"]').classList.add('active');
-            document.querySelector('.nav-links a[href="#products"]').classList.remove('active');
+        function validateName(name) {
+            return name.trim().length >= 2;
         }
 
-        function updateUserInfo() {
-            if (auth.currentUser) {
-                const user = auth.currentUser;
-                const displayName = user.displayName || user.email || 'مستخدم مجهول';
-                const photoURL = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random&size=40`;
-                userInfoDiv.innerHTML = `
-                    <img src="${photoURL}" alt="صورة المستخدم" class="user-avatar">
-                    <span class="user-name">${displayName}</span>
-                    <button class="logout-btn" onclick="logout()">تسجيل الخروج</button>
-                `;
+        // Show loading state
+        function showLoadingState(isSignin = true) {
+            if (isSignin) {
+                signinSpinner.classList.remove('hidden');
+                signinText.textContent = 'جاري تسجيل الدخول...';
+                emailSignInButton.disabled = true;
             } else {
-                userInfoDiv.innerHTML = '';
+                signupSpinner.classList.remove('hidden');
+                signupText.textContent = 'جاري إنشاء الحساب...';
+                confirmSignupButton.disabled = true;
             }
         }
 
-        async function logout() {
-            try {
-                await signOut(auth);
-                showNotification("تم تسجيل الخروج بنجاح.");
-            } catch (error) {
-                console.error("Error signing out:", error);
-                showNotification("حدث خطأ أثناء تسجيل الخروج.");
-            }
-        }
-
-        async function handleGoogleLogin(response) {
-            try {
-                // Not implemented, but left here for future reference
-                // You would need to use GoogleAuthProvider and signInWithCredential
-            } catch (error) {
-                console.error("Google login error:", error);
-                showNotification("فشل تسجيل الدخول عبر جوجل: " + error.message);
-            }
-        }
-
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = e.target.loginEmail.value;
-            const password = e.target.loginPassword.value;
-            const errorElement = document.getElementById('loginError');
-            errorElement.textContent = '';
-
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-                showNotification("تم تسجيل الدخول بنجاح!");
-            } catch (error) {
-                console.error("Login error:", error);
-                errorElement.textContent = "خطأ في تسجيل الدخول: " + error.message;
-            }
-        });
-
-        registerForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = e.target.registerName.value;
-            const lastName = e.target.registerLastName.value;
-            const email = e.target.registerEmail.value;
-            const password = e.target.registerPassword.value;
-            const errorElement = document.getElementById('registerError');
-            errorElement.textContent = '';
-            
-            try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-                
-                await updateProfile(user, {
-                    displayName: `${name} ${lastName}`
-                });
-
-                showNotification("تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول.");
-                showLoginForm();
-                e.target.reset();
-            } catch (error) {
-                console.error("Registration error:", error);
-                errorElement.textContent = "خطأ في إنشاء الحساب: " + error.message;
-            }
-        });
-
-        productForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = e.target.productName.value;
-            const price = parseFloat(e.target.productPrice.value);
-            const category = e.target.productCategory.value;
-            const description = e.target.productDescription.value;
-            
-            if (!name || isNaN(price) || !category || !description) {
-                showNotification("يرجى ملء جميع الحقول بشكل صحيح.");
-                return;
-            }
-            
-            try {
-                const productsCollection = collection(db, `artifacts/${appId}/public/data/products`);
-                await addDoc(productsCollection, {
-                    name,
-                    price,
-                    category,
-                    description,
-                    ownerId: userId,
-                    createdAt: new Date()
-                });
-                
-                showNotification("تم رفع المنتج بنجاح!");
-                e.target.reset();
-                showStore();
-            } catch (error) {
-                console.error("Error uploading product:", error);
-                showNotification("حدث خطأ أثناء رفع المنتج: " + error.message);
-            }
-        });
-
-        function setupProductListener() {
-            const productsCollection = collection(db, `artifacts/${appId}/public/data/products`);
-            onSnapshot(productsCollection, (snapshot) => {
-                const updatedProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                currentProducts = updatedProducts;
-                displayProducts(currentProducts);
-            });
-        }
-        
-        // Display products
-        function displayProducts(productsToShow) {
-            const filteredProducts = currentFilter === 'all'
-                ? productsToShow
-                : productsToShow.filter(product => product.category === currentFilter);
-
-            productGrid.innerHTML = filteredProducts.length > 0 ? '' : '<p style="text-align: center;">لا توجد منتجات حالياً.</p>';
-
-            filteredProducts.forEach(product => {
-                const productCard = document.createElement('div');
-                productCard.className = 'product-card';
-                productCard.innerHTML = `
-                    <div class="product-image"></div>
-                    <div class="product-info">
-                        <h3 class="product-title">${product.name}</h3>
-                        <p class="product-price">${product.price.toLocaleString()} دج</p>
-                        <p class="product-description">${product.description}</p>
-                        <button class="add-to-cart" onclick="addToCart(${JSON.stringify(product).replace(/"/g, '&quot;')})">
-                            إضافة للسلة
-                        </button>
-                    </div>
-                `;
-                productGrid.appendChild(productCard);
-            });
-        }
-
-        function filterProducts(category, event) {
-            currentFilter = category;
-            
-            document.querySelectorAll('.category-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-
-            displayProducts(currentProducts);
-        }
-
-        // Cart and UI Functions
-        function addToCart(product) {
-            const existingItem = cart.find(item => item.id === product.id);
-
-            if (existingItem) {
-                existingItem.quantity += 1;
+        // Hide loading state
+        function hideLoadingState(isSignin = true) {
+            if (isSignin) {
+                signinSpinner.classList.add('hidden');
+                signinText.textContent = 'تسجيل الدخول';
+                emailSignInButton.disabled = false;
             } else {
-                cart.push({ ...product, quantity: 1 });
+                signupSpinner.classList.add('hidden');
+                signupText.textContent = 'إنشاء حساب';
+                confirmSignupButton.disabled = false;
             }
-
-            updateCartCount();
-            showNotification(`تم إضافة ${product.name} للسلة`);
         }
 
-        function updateCartCount() {
-            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-            cartCountSpan.textContent = totalItems;
-        }
-
-        function toggleCart() {
-            cartModal.style.display = cartModal.style.display === 'block' ? 'none' : 'block';
+        // Show message with animation
+        function showMessage(element, message, isError = false) {
+            element.textContent = message;
+            element.className = isError ? 'mt-4 text-sm text-red-600 h-5 error-shake' : 'mt-4 text-sm text-green-600 h-5 success-animation';
             
-            if (cartModal.style.display === 'block') {
-                displayCartItems();
-            }
-        }
-
-        function displayCartItems() {
-            if (cart.length === 0) {
-                cartItemsDiv.innerHTML = '<p>السلة فارغة</p>';
-                cartTotalDiv.innerHTML = '';
-                return;
-            }
-
-            let itemsHTML = '';
-            let total = 0;
-
-            cart.forEach(item => {
-                const itemTotal = item.price * item.quantity;
-                total += itemTotal;
-                
-                itemsHTML += `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #eee;">
-                        <div>
-                            <h4>${item.name}</h4>
-                            <p>الكمية: ${item.quantity}</p>
-                        </div>
-                        <div>
-                            <p>${itemTotal.toLocaleString()} دج</p>
-                        </div>
-                    </div>
-                `;
-            });
-
-            cartItemsDiv.innerHTML = itemsHTML;
-            cartTotalDiv.innerHTML = `<h3>المجموع: ${total.toLocaleString()} دج</h3>`;
-        }
-
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 100px;
-                right: 20px;
-                background: linear-gradient(45deg, #667eea, #764ba2);
-                color: white;
-                padding: 1rem;
-                border-radius: 10px;
-                z-index: 3000;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-                animation: slideIn 0.3s ease;
-            `;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-
             setTimeout(() => {
-                notification.remove();
+                element.className = 'mt-4 text-sm text-gray-600 h-5';
             }, 3000);
         }
 
-        function showLoginForm() {
-            document.getElementById('loginFormContainer').classList.add('active');
-            document.getElementById('registerFormContainer').classList.remove('active');
-        }
+        // Google Sign-In callback
+        window.handleCredentialResponse = async function(response) {
+            try {
+                const credential = GoogleAuthProvider.credential(response.credential);
+                await signInWithCredential(auth, credential);
+                showMessage(authStatusMessageElement, 'تم تسجيل الدخول بنجاح!');
+            } catch (error) {
+                console.error('Google Sign-In Error:', error);
+                showMessage(authStatusMessageElement, 'خطأ في تسجيل الدخول عبر Google. يرجى المحاولة مرة أخرى.', true);
+            }
+        };
 
-        function showRegisterForm() {
-            document.getElementById('loginFormContainer').classList.remove('active');
-            document.getElementById('registerFormContainer').classList.add('active');
-        }
-
-        // Smooth scrolling for navigation links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const targetId = this.getAttribute('href').substring(1);
-                const targetElement = document.getElementById(targetId);
-                if (targetElement) {
-                    // Update active nav link
-                    document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-                    this.classList.add('active');
-
-                    // Handle navigation to different pages/sections
-                    if (targetId === 'products') {
-                        showStore();
-                    } else if (targetId === 'upload') {
-                        showUploadPage();
-                    } else if (targetId === 'contact' || targetId === 'about') {
-                         showStore();
-                        setTimeout(() => {
-                            targetElement.scrollIntoView({
-                                behavior: 'smooth',
-                                block: 'start'
-                            });
-                        }, 100);
+        // Initialize Google Sign-In
+        function initializeGoogleSignIn() {
+            if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== '640635892482-ldefv7a2slqgrq09of42qpme20eumkq9.apps.googleusercontent.com') {
+                const onloadDiv = document.getElementById('g_id_onload');
+                onlodDiv.setAttribute('data-client_id', GOOGLE_CLIENT_ID);
+                
+                // Wait for Google library to load
+                const checkGoogleLoaded = () => {
+                    if (window.google && window.google.accounts) {
+                        google.accounts.id.initialize({
+                            client_id: GOOGLE_CLIENT_ID,
+                            callback: handleCredentialResponse
+                        });
+                        google.accounts.id.renderButton(
+                            document.querySelector('.g_id_signin'),
+                            { 
+                                type: 'standard',
+                                size: 'large',
+                                theme: 'outline',
+                                text: 'signin_with',
+                                shape: 'rectangular',
+                                logo_alignment: 'left',
+                                width: 300
+                            }
+                        );
+                    } else {
+                        // Retry after 100ms if Google library not loaded yet
+                        setTimeout(checkGoogleLoaded, 100);
                     }
+                };
+                checkGoogleLoaded();
+            } else {
+                console.warn('Google Client ID not configured');
+                // إخفاء زر Google إذا لم يتم تكوين Client ID
+                const googleButton = document.querySelector('.g_id_signin');
+                if (googleButton) {
+                    googleButton.style.display = 'none';
                 }
-            });
-        });
-
-        // Make functions globally accessible
-        window.filterProducts = filterProducts;
-        window.addToCart = addToCart;
-        window.toggleCart = toggleCart;
-        window.logout = logout;
-        window.showLoginForm = showLoginForm;
-        window.showRegisterForm = showRegisterForm;
-
-        // Add slide in animation to CSS
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideIn {
-                from {
-                    transform: translateX(100%);
-                    opacity: 0;
-                }
-                to {
-                    transform: translateX(0);
-                    opacity: 1;
+                const orDivider = document.querySelector('.relative.w-full.text-center.my-4');
+                if (orDivider) {
+                    orDivider.style.display = 'none';
                 }
             }
-        `;
-        document.head.appendChild(style);
-    </script>
+        }
 
-    <!-- Login Page -->
-    <div id="loginPage">
-        <div class="login-container">
-            <div class="login-card">
-                <div class="login-logo">متجر الأناقة</div>
-                <h2 class="login-title">مرحباً بك</h2>
-                <p class="login-subtitle">قم بتسجيل الدخول للوصول لمتجرنا المميز</p>
-                
-                <!-- Login Form -->
-                <div id="loginFormContainer" class="form-container active">
-                    <form id="loginForm">
-                        <div class="input-group">
-                            <label for="loginEmail">البريد الإلكتروني</label>
-                            <input type="email" id="loginEmail" required>
-                        </div>
-                        <div class="input-group">
-                            <label for="loginPassword">كلمة المرور</label>
-                            <input type="password" id="loginPassword" required>
-                        </div>
-                        <button type="submit" class="login-button">تسجيل الدخول</button>
-                        <div id="loginError" class="error-message"></div>
-                    </form>
-                    <button id="showRegisterBtn" class="toggle-btn" onclick="showRegisterForm()">
-                        ليس لديك حساب؟ قم بإنشاء حساب جديد
-                    </button>
-                </div>
-                
-                <!-- Register Form -->
-                <div id="registerFormContainer" class="form-container">
-                    <form id="registerForm">
-                         <div class="names-group">
-                            <div class="input-group">
-                                <label for="registerName">الاسم</label>
-                                <input type="text" id="registerName" required>
-                            </div>
-                            <div class="input-group">
-                                <label for="registerLastName">اللقب</label>
-                                <input type="text" id="registerLastName" required>
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <label for="registerEmail">البريد الإلكتروني</label>
-                            <input type="email" id="registerEmail" required>
-                        </div>
-                        <div class="input-group">
-                            <label for="registerPassword">كلمة المرور</label>
-                            <input type="password" id="registerPassword" required>
-                        </div>
-                        <button type="submit" class="login-button">إنشاء حساب</button>
-                        <div id="registerError" class="error-message"></div>
-                    </form>
-                    <button id="showLoginBtn" class="toggle-btn" onclick="showLoginForm()">
-                        لديك حساب بالفعل؟ قم بتسجيل الدخول
-                    </button>
-                </div>
+        // Function to update the balance on the page
+        function updateBalanceUI(newBalance) {
+            currentBalance = newBalance;
+            balanceElement.textContent = `$${currentBalance.toFixed(2)}`;
+            balancePopup.textContent = `$${currentBalance.toFixed(2)}`;
+            balanceElement.classList.add('scale-110');
+            setTimeout(() => {
+                balanceElement.classList.remove('scale-110');
+                balanceElement.classList.add('scale-100');
+            }, 300);
+        }
 
-                <div class="divider">
-                    <span>أو</span>
-                </div>
+        // Function to handle the end of an ad
+        async function endAd(reward) {
+            isAdPlaying = false;
+            if (adTimer) {
+                clearTimeout(adTimer);
+            }
+            
+            watchButton.disabled = true;
+            skipButton.disabled = true;
 
-                <div id="g_id_onload"
-                     data-client_id="640635892482-ldefv7a2slqgrq09of42qpme20eumkq9.apps.googleusercontent.com"
-                     data-callback="handleGoogleLogin"
-                     data-auto_prompt="false">
-                </div>
-                
-                <div class="g_id_signin" 
-                     data-type="standard"
-                     data-shape="pill"
-                     data-theme="outline"
-                     data-text="signin_with"
-                     data-size="large"
-                     data-logo_alignment="left">
-                </div>
-            </div>
-        </div>
-    </div>
+            if (userId) {
+                if (reward > 0) {
+                    const newBalance = currentBalance + reward;
+                    try {
+                        const userDocRef = doc(db, `/artifacts/${appId}/users/${userId}/balance/current`);
+                        await setDoc(userDocRef, { value: newBalance });
+                        statusMessageElement.textContent = `تمت العملية بنجاح! تم إضافة $${reward.toFixed(2)} إلى رصيدك.`;
+                        statusMessageElement.className = 'mt-4 text-sm text-green-600 h-5 success-animation';
+                    } catch (error) {
+                        console.error("Error updating balance in Firestore: ", error);
+                        statusMessageElement.textContent = `حدث خطأ في حفظ رصيدك.`;
+                        statusMessageElement.className = 'mt-4 text-sm text-red-600 h-5 error-shake';
+                    }
+                } else {
+                    statusMessageElement.textContent = 'تم تخطي الإعلان بنجاح. لم يتم كسب أي نقود.';
+                    statusMessageElement.className = 'mt-4 text-sm text-gray-600 h-5';
+                }
+            } else {
+                statusMessageElement.textContent = 'يجب تسجيل الدخول لحفظ أرباحك.';
+                statusMessageElement.className = 'mt-4 text-sm text-red-600 h-5 error-shake';
+            }
 
-    <!-- Store Container -->
-    <div id="storeContainer" class="store-container">
-        <header>
-            <nav class="container">
-                <div class="logo">متجر الأناقة</div>
-                <ul class="nav-links">
-                    <li><a href="#products" class="active">المنتجات</a></li>
-                    <li><a href="#upload">رفع منتج جديد</a></li>
-                    <li><a href="#about">من نحن</a></li>
-                    <li><a href="#contact">تواصل معنا</a></li>
-                </ul>
-                <div class="nav-right">
-                    <div class="user-info" id="userInfo"></div>
-                    <div class="cart-icon" onclick="toggleCart()">
-                        🛒
-                        <span class="cart-count" id="cartCount">0</span>
-                    </div>
-                </div>
-            </nav>
-        </header>
+            setTimeout(() => {
+                watchButton.disabled = false;
+                skipButton.disabled = false;
+                watchButton.textContent = 'شاهد إعلان ($0.01)';
+                adImageElement.src = "https://placehold.co/400x200/e5e7eb/6b7280?text=جاري+التحميل...";
+                statusMessageElement.className = 'mt-4 text-sm text-gray-600 h-5';
+            }, 2000);
+        }
 
-        <section class="products" id="products">
-            <div class="container">
-                <h2 class="section-title">منتجاتنا المميزة</h2>
-                
-                <div class="product-categories">
-                    <button class="category-btn active" onclick="filterProducts('all', event)">الكل</button>
-                    <button class="category-btn" onclick="filterProducts('clothing', event)">ملابس</button>
-                    <button class="category-btn" onclick="filterProducts('shoes', event)">أحذية</button>
-                    <button class="category-btn" onclick="filterProducts('accessories', event)">إكسسوارات</button>
-                </div>
+        // Event Listeners
 
-                <div class="product-grid" id="productGrid">
-                    <!-- Products will be generated by JavaScript -->
-                </div>
-            </div>
-        </section>
+        // Watch ad button
+        watchButton.addEventListener('click', () => {
+            if (isAdPlaying) return;
+            isAdPlaying = true;
+            
+            watchButton.disabled = true;
+            skipButton.disabled = true;
+            watchButton.textContent = 'جاري المشاهدة...';
+            statusMessageElement.textContent = 'يرجى الانتظار حتى ينتهي الإعلان.';
+            statusMessageElement.className = 'mt-4 text-sm text-blue-600 h-5';
 
-        <footer id="contact">
-            <div class="container">
-                <div class="footer-content">
-                    <div class="footer-section">
-                        <h3>متجر الأناقة</h3>
-                        <p>متجرك المفضل للملابس والأحذية العصرية</p>
-                        <p>جودة عالية وأسعار مناسبة</p>
-                    </div>
-                    <div class="footer-section">
-                        <h3>روابط سريعة</h3>
-                        <a href="#products">المنتجات</a>
-                        <a href="#upload">رفع منتج جديد</a>
-                        <a href="#about">من نحن</a>
-                        <a href="#contact">تواصل معنا</a>
-                    </div>
-                    <div class="footer-section">
-                        <h3>تواصل معنا</h3>
-                        <p>📧 info@store.com</p>
-                        <p>📱 +213 123 456 789</p>
-                        <p>📍 الجزائر، وهران</p>
-                    </div>
-                </div>
-                <p>&copy; 2025 متجر الأناقة. جميع الحقوق محفوظة.</p>
-            </div>
-        </footer>
+            adImageElement.src = adImages[currentAdIndex];
+            currentAdIndex = (currentAdIndex + 1) % adImages.length;
+            
+            adTimer = setTimeout(() => {
+                endAd(watchReward);
+            }, adDuration);
+        });
 
-        <!-- Cart Modal -->
-        <div class="cart-modal" id="cartModal">
-            <div class="cart-content">
-                <span class="close-cart" onclick="toggleCart()">&times;</span>
-                <h2>سلة المشتريات</h2>
-                <div id="cartItems"></div>
-                <div id="cartTotal"></div>
-                <button class="cta-button" style="width: 100%; margin-top: 1rem;">إتمام الطلب</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Upload Product Container -->
-    <div id="uploadContainer" class="upload-container">
-        <h2 class="section-title">رفع منتج جديد</h2>
-        <form id="productForm" class="upload-form">
-            <div class="input-group">
-                <label for="productName">اسم المنتج</label>
-                <input type="text" id="productName" required>
-            </div>
-            <div class="input-group">
-                <label for="productPrice">السعر (دج)</label>
-                <input type="number" id="productPrice" required>
-            </div>
-            <div class="input-group">
-                <label for="productCategory">الفئة</label>
-                <select id="productCategory" required>
-                    <option value="clothing">ملابس</option>
-                    <option value="shoes">أحذية</option>
-                    <option value="accessories">إكسسوارات</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label for="productDescription">الوصف</label>
-                <textarea id="productDescription" required></textarea>
-            </div>
-            <button type="submit" class="upload-button">رفع المنتج</button>
-        </form>
-    </div>
-</body>
-</html>
+        // Skip ad button
+        skipButton.addEventListener('click', () => {
+            endAd(0);
+        });
+
+        // Wallet popup
+        walletButton.addEventListener('click', () => {
+            walletPopup.classList.remove('hidden');
+        });
+
+        closeWalletPopup.addEventListener('click', () => {
+            walletPopup.classList.add('hidden');
+        });
+
+        // Logout button
+        logoutButton.addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                showMessage(authStatusMessageElement, 'تم تسجيل الخروج بنجاح!');
+            } catch (error) {
+                console.error('Logout error:', error);
+                showMessage(authStatusMessageElement, 'خطأ في تسجيل الخروج. يرجى المحاولة مرة أخرى.', true);
+            }
+        });
+
+        // Signup button
+        signupButton.addEventListener('click', () => {
+            signupPopup.classList.remove('hidden');
+            // Clear all inputs
+            nameSignupInput.value = '';
+            emailSignupInput.value = '';
+            passwordSignupInput.value = '';
+            confirmPasswordInput.value = '';
+            termsCheckbox.checked = false;
+            signupStatusMessageElement.textContent = '';
+        });
+
+        // Close signup popup
+        closeSignupPopup.addEventListener('click', () => {
+            signupPopup.classList.add('hidden');
+        });
+
+        // Confirm signup
+        confirmSignupButton.addEventListener('click', async () => {
+            const name = nameSignupInput.value.trim();
+            const email = emailSignupInput.value.trim();
+            const password = passwordSignupInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            
+            // Validation
+            if (!name || !email || !password || !confirmPassword) {
+                showMessage(signupStatusMessageElement, 'يرجى ملء جميع الحقول.', true);
+                return;
+            }
+
+            if (!validateName(name)) {
+                showMessage(signupStatusMessageElement, 'يجب أن يكون الاس

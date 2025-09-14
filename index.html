@@ -381,11 +381,8 @@
                 const credential = GoogleAuthProvider.credential(response.credential);
                 await signInWithCredential(auth, credential);
                 
-                // Directly close the login/signup screens and show the main app
-                loginScreen.classList.add('hidden');
-                signupPopup.classList.add('hidden');
-                mainApp.classList.remove('hidden');
-
+                // No longer need to manually manage the screen transition here,
+                // as the onAuthStateChanged listener will handle it.
                 showMessage(authStatusMessageElement, 'تم تسجيل الدخول بنجاح!');
             } catch (error) {
                 console.error('Google Sign-In Error:', error);
@@ -627,8 +624,9 @@
                         userIdPopup.textContent = userId;
                         userEmailPopup.textContent = userEmail;
 
-                        // Hide login screen and show main app
+                        // Hide login/signup screens and show main app
                         loginScreen.classList.add('hidden');
+                        signupPopup.classList.add('hidden');
                         mainApp.classList.remove('hidden');
 
                         // Listen to the user's balance document in real-time

@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>شاهد واربح</title>
-
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts for a clean font -->
@@ -19,33 +18,26 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
         }
-
         /* Custom scrollbar style for the wallet details */
         .wallet-details-container::-webkit-scrollbar {
             width: 8px;
         }
-
         .wallet-details-container::-webkit-scrollbar-track {
             background: #f1f1f1;
             border-radius: 10px;
         }
-
         .wallet-details-container::-webkit-scrollbar-thumb {
             background: #888;
             border-radius: 10px;
         }
-
         .wallet-details-container::-webkit-scrollbar-thumb:hover {
             background: #555;
-            border-radius: 10px;
         }
-
         .glass-effect {
             backdrop-filter: blur(20px);
             background: rgba(255, 255, 255, 0.95);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-
         .loading-spinner {
             border: 3px solid #f3f3f3;
             border-top: 3px solid #3498db;
@@ -56,61 +48,35 @@
             display: inline-block;
             margin-left: 8px;
         }
-
         @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-
         .success-animation {
             animation: successPulse 0.6s ease-in-out;
         }
-
         @keyframes successPulse {
-            0% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.05);
-            }
-
-            100% {
-                transform: scale(1);
-            }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
-
         .error-shake {
             animation: shake 0.5s ease-in-out;
         }
-
         @keyframes shake {
-            0%, 100% {
-                transform: translateX(0);
-            }
-
-            25% {
-                transform: translateX(-5px);
-            }
-
-            75% {
-                transform: translateX(5px);
-            }
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
         }
     </style>
 </head>
-
 <body class="flex items-center justify-center min-h-screen p-4">
+
     <!-- Login screen -->
     <div id="login-screen" class="glass-effect flex flex-col items-center justify-center text-center p-8 rounded-2xl shadow-2xl w-full max-w-sm">
         <h1 class="text-4xl font-extrabold text-blue-600 mb-4">أهلاً بك في شاهد واربح!</h1>
         <p class="text-lg text-gray-600 mb-8">قم بتسجيل الدخول أو أنشئ حسابًا جديدًا.</p>
-
+        
         <!-- Google Sign-in Button -->
         <div id="g_id_onload" 
              data-client_id="640635892482-ldefv7a2slqgrq09of42qpme20eumkq9.apps.googleusercontent.com"
@@ -126,26 +92,31 @@
              data-logo_alignment="left"
              data-width="300">
         </div>
+
         <div class="relative w-full text-center my-4">
             <div class="absolute inset-0 flex items-center">
                 <div class="w-full border-t border-gray-300"></div>
             </div>
             <div class="relative inline-block px-4 bg-white text-gray-500 text-sm">أو</div>
         </div>
-
+        
         <div class="w-full flex flex-col gap-4 mb-4">
             <input id="email-input" type="email" placeholder="البريد الإلكتروني" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200">
             <input id="password-input" type="password" placeholder="كلمة المرور" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200">
         </div>
+
         <button id="email-signin-button" class="w-full flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-50 shadow-lg mb-4">
             <span id="signin-text">تسجيل الدخول</span>
             <div id="signin-spinner" class="loading-spinner hidden"></div>
         </button>
+
         <button id="signup-button" class="w-full flex items-center justify-center bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-green-300 focus:ring-opacity-50 shadow-lg">
             إنشاء حساب جديد
         </button>
+
         <p id="auth-status-message" class="mt-4 text-sm text-gray-600 h-5"></p>
     </div>
+
     <!-- Signup Popup -->
     <div id="signup-popup" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
         <div class="glass-effect p-8 rounded-2xl shadow-2xl w-full max-w-sm text-center">
@@ -156,36 +127,19 @@
                 </button>
             </div>
             
-            <!-- Google Sign-in for Signup Popup -->
-            <div class="g_id_signin mb-4" 
-                 data-type="standard" 
-                 data-size="large" 
-                 data-theme="outline" 
-                 data-text="signin_with"
-                 data-shape="rectangular"
-                 data-logo_alignment="left"
-                 data-width="300">
-            </div>
-            <div class="relative w-full text-center my-4">
-                <div class="absolute inset-0 flex items-center">
-                    <div class="w-full border-t border-gray-300"></div>
-                </div>
-                <div class="relative inline-block px-4 bg-white text-gray-500 text-sm">أو</div>
-            </div>
-
             <div class="w-full flex flex-col gap-4 mb-4">
                 <input id="name-signup-input" type="text" placeholder="الاسم الكامل" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200">
                 <input id="email-signup-input" type="email" placeholder="البريد الإلكتروني" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200">
                 <input id="password-signup-input" type="password" placeholder="كلمة المرور (6 أحرف على الأقل)" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200">
                 <input id="confirm-password-input" type="password" placeholder="تأكيد كلمة المرور" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200">
             </div>
-
+            
             <!-- Terms and Conditions -->
             <div class="flex items-center mb-4">
                 <input id="terms-checkbox" type="checkbox" class="mr-2 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
                 <label for="terms-checkbox" class="text-sm text-gray-700">أوافق على <a href="#" class="text-green-600 underline">الشروط والأحكام</a></label>
             </div>
-
+            
             <button id="confirm-signup-button" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-green-300 focus:ring-opacity-50 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
                 <span id="signup-text">إنشاء حساب</span>
                 <div id="signup-spinner" class="loading-spinner hidden"></div>
@@ -193,8 +147,10 @@
             <p id="signup-status-message" class="mt-4 text-sm text-gray-600 h-5"></p>
         </div>
     </div>
+
     <!-- Main Card Container (initially hidden) -->
     <div id="main-app" class="hidden glass-effect p-8 rounded-2xl shadow-2xl text-center w-full max-w-md">
+
         <!-- Header with Title and Wallet Button -->
         <div class="flex items-center justify-between mb-6">
             <div class="flex flex-col items-start">
@@ -205,13 +161,14 @@
                 <button id="wallet-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-50 shadow-lg">
                     محفظتي
                 </button>
-                <button id="logout-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-ring-red-300 focus:ring-opacity-50 shadow-lg">
+                <button id="logout-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-300 focus:ring-opacity-50 shadow-lg">
                     تسجيل الخروج
                 </button>
             </div>
         </div>
-        <p class="text-gray-600 mb-6">شاهد إعلانات قصيرة واكسب المال بسهولة!</p>
 
+        <p class="text-gray-600 mb-6">شاهد إعلانات قصيرة واكسب المال بسهولة!</p>
+        
         <!-- Wallet Details Popup -->
         <div id="wallet-popup" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
             <div class="glass-effect p-6 rounded-2xl shadow-2xl w-full max-w-sm text-center">
@@ -221,7 +178,7 @@
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
-
+                
                 <div class="wallet-details-container max-h-64 overflow-y-auto mb-4 p-2 bg-gray-50/30 rounded-lg backdrop-blur-sm">
                     <div class="bg-blue-50/50 p-4 rounded-xl shadow-inner mb-4 backdrop-blur-sm">
                         <p class="text-lg font-semibold text-gray-700">رصيدك الحالي:</p>
@@ -236,16 +193,18 @@
                 </div>
             </div>
         </div>
+
         <!-- Current Balance Section -->
         <div class="mb-6 bg-blue-50/30 p-4 rounded-xl shadow-inner backdrop-blur-sm">
             <p class="text-lg font-semibold text-gray-700">رصيدك الحالي:</p>
             <p id="balance" class="text-5xl font-extrabold text-green-600 mt-2 transition-all duration-500 ease-in-out transform scale-100">$0.00</p>
         </div>
+
         <!-- Ad Placeholder / Video Player -->
         <div id="ad-container" class="w-full h-48 bg-gray-200/30 rounded-xl overflow-hidden mb-6 flex items-center justify-center shadow-md backdrop-blur-sm">
             <img id="ad-image" src="https://placehold.co/400x200/e5e7eb/6b7280?text=جاري+التحميل..." alt="Ad Placeholder" class="w-full h-full object-cover rounded-xl">
         </div>
-
+        
         <!-- Action Buttons Container -->
         <div class="flex flex-col sm:flex-row gap-4">
             <button id="watch-button" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-50 shadow-lg">
@@ -255,15 +214,30 @@
                 تخطي الإعلان
             </button>
         </div>
+
         <!-- Status Message -->
         <p id="status-message" class="mt-4 text-sm text-gray-600 h-5"></p>
+
     </div>
+
     <!-- Firebase Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signInWithCustomToken, GoogleAuthProvider, signInWithCredential, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
+        
+        // =====================================
+        // إعدادات Google Client ID
+        // =====================================
+        // أضف Google Client ID الخاص بك هنا من Google Cloud Console
+        // للحصول على Client ID: https://console.cloud.google.com/
+        // 1. إنشاء مشروع جديد أو اختيار مشروع موجود
+        // 2. تفعيل Google Identity API
+        // 3. إنشاء OAuth 2.0 Client ID من نوع "Web application"
+        // 4. إضافة الدومين الخاص بك إلى "Authorized origins"
+        const GOOGLE_CLIENT_ID = '640635892482-ldefv7a2slqgrq09of42qpme20eumkq9.apps.googleusercontent.com'; // ضع Client ID هنا
+        // =====================================
+        
         // IMPORTANT: Global variables are provided by the Canvas environment.
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
@@ -289,7 +263,7 @@
         const emailSignInButton = document.getElementById('email-signin-button');
         const emailInput = document.getElementById('email-input');
         const passwordInput = document.getElementById('password-input');
-
+        
         // Signup elements
         const signupButton = document.getElementById('signup-button');
         const signupPopup = document.getElementById('signup-popup');
@@ -369,7 +343,7 @@
         function showMessage(element, message, isError = false) {
             element.textContent = message;
             element.className = isError ? 'mt-4 text-sm text-red-600 h-5 error-shake' : 'mt-4 text-sm text-green-600 h-5 success-animation';
-
+            
             setTimeout(() => {
                 element.className = 'mt-4 text-sm text-gray-600 h-5';
             }, 3000);
@@ -380,19 +354,70 @@
             try {
                 const credential = GoogleAuthProvider.credential(response.credential);
                 await signInWithCredential(auth, credential);
-                
-                // Directly manage the screen transition after successful sign-in
-                if (auth.currentUser) {
-                    loginScreen.classList.add('hidden');
-                    signupPopup.classList.add('hidden');
-                    mainApp.classList.remove('hidden');
-                }
                 showMessage(authStatusMessageElement, 'تم تسجيل الدخول بنجاح!');
             } catch (error) {
                 console.error('Google Sign-In Error:', error);
                 showMessage(authStatusMessageElement, 'خطأ في تسجيل الدخول عبر Google. يرجى المحاولة مرة أخرى.', true);
             }
         };
+
+        // Initialize Google Sign-In
+        function initializeGoogleSignIn() {
+            if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== 'YOUR_GOOGLE_CLIENT_ID_HERE') {
+                console.log('تهيئة Google Sign-In مع Client ID:', GOOGLE_CLIENT_ID);
+                
+                const onloadDiv = document.getElementById('g_id_onload');
+                onloadDiv.setAttribute('data-client_id', GOOGLE_CLIENT_ID);
+                
+                // Wait for Google library to load
+                const checkGoogleLoaded = () => {
+                    if (window.google && window.google.accounts) {
+                        try {
+                            google.accounts.id.initialize({
+                                client_id: GOOGLE_CLIENT_ID,
+                                callback: handleCredentialResponse,
+                                auto_select: false,
+                                cancel_on_tap_outside: true
+                            });
+                            
+                            google.accounts.id.renderButton(
+                                document.querySelector('.g_id_signin'),
+                                { 
+                                    type: 'standard',
+                                    size: 'large',
+                                    theme: 'outline',
+                                    text: 'signin_with',
+                                    shape: 'rectangular',
+                                    logo_alignment: 'left',
+                                    width: 300,
+                                    locale: 'ar'
+                                }
+                            );
+                            console.log('تم تهيئة Google Sign-In بنجاح');
+                        } catch (error) {
+                            console.error('خطأ في تهيئة Google Sign-In:', error);
+                        }
+                    } else {
+                        // Retry after 100ms if Google library not loaded yet
+                        setTimeout(checkGoogleLoaded, 100);
+                    }
+                };
+                
+                // Start checking after a small delay to ensure DOM is ready
+                setTimeout(checkGoogleLoaded, 500);
+            } else {
+                console.warn('Google Client ID لم يتم تكوينه بشكل صحيح');
+                // إخفاء زر Google إذا لم يتم تكوين Client ID
+                const googleButton = document.querySelector('.g_id_signin');
+                if (googleButton) {
+                    googleButton.style.display = 'none';
+                }
+                const orDivider = document.querySelector('.relative.w-full.text-center.my-4');
+                if (orDivider) {
+                    orDivider.style.display = 'none';
+                }
+            }
+        }
 
         // Function to update the balance on the page
         function updateBalanceUI(newBalance) {
@@ -412,9 +437,10 @@
             if (adTimer) {
                 clearTimeout(adTimer);
             }
-
+            
             watchButton.disabled = true;
             skipButton.disabled = true;
+
             if (userId) {
                 if (reward > 0) {
                     const newBalance = currentBalance + reward;
@@ -436,6 +462,7 @@
                 statusMessageElement.textContent = 'يجب تسجيل الدخول لحفظ أرباحك.';
                 statusMessageElement.className = 'mt-4 text-sm text-red-600 h-5 error-shake';
             }
+
             setTimeout(() => {
                 watchButton.disabled = false;
                 skipButton.disabled = false;
@@ -446,19 +473,21 @@
         }
 
         // Event Listeners
+
         // Watch ad button
         watchButton.addEventListener('click', () => {
             if (isAdPlaying) return;
             isAdPlaying = true;
-
+            
             watchButton.disabled = true;
             skipButton.disabled = true;
             watchButton.textContent = 'جاري المشاهدة...';
             statusMessageElement.textContent = 'يرجى الانتظار حتى ينتهي الإعلان.';
             statusMessageElement.className = 'mt-4 text-sm text-blue-600 h-5';
+
             adImageElement.src = adImages[currentAdIndex];
             currentAdIndex = (currentAdIndex + 1) % adImages.length;
-
+            
             adTimer = setTimeout(() => {
                 endAd(watchReward);
             }, adDuration);
@@ -492,6 +521,19 @@
         // Signup button
         signupButton.addEventListener('click', () => {
             signupPopup.classList.remove('hidden');
+            
+            // إعادة تعيين النافذة للحالة الأولى
+            resetSignupForm();
+        });
+
+        // Close signup popup
+        closeSignupPopup.addEventListener('click', () => {
+            signupPopup.classList.add('hidden');
+            resetSignupForm();
+        });
+
+        // دالة لإعادة تعيين نموذج التسجيل
+        function resetSignupForm() {
             // Clear all inputs
             nameSignupInput.value = '';
             emailSignupInput.value = '';
@@ -499,12 +541,61 @@
             confirmPasswordInput.value = '';
             termsCheckbox.checked = false;
             signupStatusMessageElement.textContent = '';
-        });
 
-        // Close signup popup
-        closeSignupPopup.addEventListener('click', () => {
-            signupPopup.classList.add('hidden');
-        });
+            // إظهار جميع الحقول
+            nameSignupInput.style.display = 'block';
+            emailSignupInput.style.display = 'block';
+            passwordSignupInput.style.display = 'block';
+            confirmPasswordInput.style.display = 'block';
+
+            // إعادة تعيين الزر
+            confirmSignupButton.textContent = 'إنشاء حساب';
+            confirmSignupButton.className = 'w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-green-300 focus:ring-opacity-50 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed';
+
+            // إظهار زر Google والفاصل
+            const googleSignupButton = document.querySelector('.g_id_signin_signup');
+            const orDivider = document.querySelectorAll('.relative.w-full.text-center.my-4')[1];
+            if (googleSignupButton) {
+                googleSignupButton.style.display = 'block';
+            }
+            if (orDivider) {
+                orDivider.style.display = 'block';
+            }
+
+            // إزالة معلومات Google إن وجدت
+            const googleInfoDiv = document.getElementById('google-info');
+            if (googleInfoDiv) {
+                googleInfoDiv.remove();
+            }
+
+            // تنظيف البيانات
+            if (window.googleUserData) {
+                delete window.googleUserData;
+            }
+
+            // Re-initialize Google button for signup popup
+            setTimeout(() => {
+                if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== 'YOUR_GOOGLE_CLIENT_ID_HERE' && window.google && window.google.accounts) {
+                    try {
+                        google.accounts.id.renderButton(
+                            document.querySelector('.g_id_signin_signup'),
+                            { 
+                                type: 'standard',
+                                size: 'large',
+                                theme: 'outline',
+                                text: 'signup_with',
+                                shape: 'rectangular',
+                                logo_alignment: 'left',
+                                width: 300,
+                                locale: 'ar'
+                            }
+                        );
+                    } catch (error) {
+                        console.error('خطأ في تهيئة زر Google للتسجيل:', error);
+                    }
+                }
+            }, 100);
+        }
 
         // Confirm signup
         confirmSignupButton.addEventListener('click', async () => {
@@ -512,69 +603,75 @@
             const email = emailSignupInput.value.trim();
             const password = passwordSignupInput.value;
             const confirmPassword = confirmPasswordInput.value;
-
+            
             // Validation
             if (!name || !email || !password || !confirmPassword) {
                 showMessage(signupStatusMessageElement, 'يرجى ملء جميع الحقول.', true);
                 return;
             }
+
             if (!validateName(name)) {
-                showMessage(signupStatusMessageElement, 'يجب أن يكون الاسم على الأقل حرفين.', true);
+                showMessage(signupStatusMessageElement, 'يجب أن يكون الاسم حرفين على الأقل.', true);
                 return;
             }
+
             if (!validateEmail(email)) {
-                showMessage(signupStatusMessageElement, 'البريد الإلكتروني غير صالح.', true);
+                showMessage(signupStatusMessageElement, 'يرجى إدخال بريد إلكتروني صحيح.', true);
                 return;
             }
+
             if (!validatePassword(password)) {
-                showMessage(signupStatusMessageElement, 'يجب أن تكون كلمة المرور 6 أحرف على الأقل.', true);
+                showMessage(signupStatusMessageElement, 'كلمة المرور يجب أن تكون 6 أحرف على الأقل.', true);
                 return;
             }
+
             if (password !== confirmPassword) {
-                showMessage(signupStatusMessageElement, 'كلمة المرور وتأكيدها غير متطابقتين.', true);
+                showMessage(signupStatusMessageElement, 'كلمات المرور غير متطابقة.', true);
                 return;
             }
+
             if (!termsCheckbox.checked) {
                 showMessage(signupStatusMessageElement, 'يجب الموافقة على الشروط والأحكام.', true);
                 return;
             }
 
             showLoadingState(false);
+
             try {
-                // Create user with email and password
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
 
-                // Update user profile with name
+                // Update user profile with the provided name
                 await updateProfile(user, { displayName: name });
+                
+                // Save user info to Firestore
+                const userDocRef = doc(db, `/artifacts/${appId}/users/${user.uid}/profile/info`);
+                await setDoc(userDocRef, { name: name, email: email });
 
-                // Initialize user balance in Firestore
-                const userDocRef = doc(db, `/artifacts/${appId}/users/${user.uid}/balance/current`);
-                await setDoc(userDocRef, { value: 0.0 });
-
-                hideLoadingState(false);
-                showMessage(signupStatusMessageElement, 'تم إنشاء حسابك بنجاح! يرجى تسجيل الدخول.', false);
-                signupPopup.classList.add('hidden');
+                showMessage(signupStatusMessageElement, 'تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول.');
+                setTimeout(() => {
+                    signupPopup.classList.add('hidden');
+                    authStatusMessageElement.textContent = '';
+                }, 2000);
             } catch (error) {
-                hideLoadingState(false);
-                let message = 'حدث خطأ. يرجى المحاولة مرة أخرى.';
-                switch (error.code) {
-                    case 'auth/email-already-in-use':
-                        message = 'البريد الإلكتروني مستخدم بالفعل.';
-                        break;
-                    case 'auth/invalid-email':
-                        message = 'البريد الإلكتروني غير صالح.';
-                        break;
-                    case 'auth/weak-password':
-                        message = 'كلمة المرور ضعيفة جدًا.';
-                        break;
+                console.error("Signup failed:", error);
+                let errorMessage = 'خطأ في إنشاء الحساب. يرجى المحاولة لاحقاً.';
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMessage = 'هذا البريد الإلكتروني مستخدم بالفعل.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = 'صيغة البريد الإلكتروني غير صحيحة.';
+                } else if (error.code === 'auth/weak-password') {
+                    errorMessage = 'كلمة المرور ضعيفة جداً، يجب أن تكون 6 أحرف على الأقل.';
+                } else if (error.code === 'auth/operation-not-allowed') {
+                    errorMessage = 'عملية التسجيل عبر البريد الإلكتروني غير متاحة في الوقت الحالي.';
                 }
-                showMessage(signupStatusMessageElement, message, true);
-                console.error("Signup error:", error);
+                showMessage(signupStatusMessageElement, errorMessage, true);
+            } finally {
+                hideLoadingState(false);
             }
         });
 
-        // Email signin
+        // Email/Password sign-in
         emailSignInButton.addEventListener('click', async () => {
             const email = emailInput.value.trim();
             const password = passwordInput.value;
@@ -584,97 +681,109 @@
                 return;
             }
 
+            if (!validateEmail(email)) {
+                showMessage(authStatusMessageElement, 'يرجى إدخال بريد إلكتروني صحيح.', true);
+                return;
+            }
+
             showLoadingState(true);
+
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                hideLoadingState(true);
                 showMessage(authStatusMessageElement, 'تم تسجيل الدخول بنجاح!');
             } catch (error) {
-                hideLoadingState(true);
-                let message = 'خطأ في تسجيل الدخول. يرجى التحقق من بياناتك.';
-                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-                    message = 'البريد الإلكتروني أو كلمة المرور غير صحيحة.';
+                console.error("Email/Password sign-in failed:", error);
+                let errorMessage = 'خطأ في تسجيل الدخول. يرجى التحقق من البيانات.';
+                if (error.code === 'auth/user-not-found') {
+                    errorMessage = 'لم يتم العثور على هذا الحساب. يرجى إنشاء حساب جديد.';
+                } else if (error.code === 'auth/wrong-password') {
+                    errorMessage = 'كلمة المرور غير صحيحة.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = 'صيغة البريد الإلكتروني غير صحيحة.';
+                } else if (error.code === 'auth/user-disabled') {
+                    errorMessage = 'تم تعطيل هذا الحساب.';
+                } else if (error.code === 'auth/operation-not-allowed') {
+                    errorMessage = 'عملية تسجيل الدخول عبر البريد الإلكتروني غير متاحة في الوقت الحالي.';
                 }
-                showMessage(authStatusMessageElement, message, true);
-                console.error("Sign-in error:", error);
+                showMessage(authStatusMessageElement, errorMessage, true);
+            } finally {
+                hideLoadingState(true);
             }
         });
 
-
-        // Firebase Initialization and Auth State Listener
-        // ===============================================
-
-        async function initializeFirebase() {
+        // Initialize Firebase and set up listener
+        window.onload = async function() {
             try {
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
 
-                // Initial authentication with custom token if available
+                // Initialize Google Sign-In
+                initializeGoogleSignIn();
+
+                // Sign in with the custom token provided by the environment
                 if (initialAuthToken) {
                     await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
                 }
 
-                // Listen for authentication state changes
+                // Set up a listener for authentication state changes
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
                         // User is signed in
                         userId = user.uid;
-                        userEmail = user.email || 'غير متوفر';
+                        userEmail = user.email;
                         userName = user.displayName || 'مستخدم';
-                        welcomeMessage.textContent = `مرحباً بك، ${userName}!`;
+                        
                         userIdPopup.textContent = userId;
-                        userEmailPopup.textContent = userEmail;
-
-                        // Hide login/signup screens and show main app
+                        userEmailPopup.textContent = userEmail || 'غير محدد';
+                        welcomeMessage.textContent = `مرحباً ${userName}!`;
+                        
                         loginScreen.classList.add('hidden');
-                        signupPopup.classList.add('hidden');
                         mainApp.classList.remove('hidden');
-
-                        // Listen to the user's balance document in real-time
-                        const balanceDocRef = doc(db, `/artifacts/${appId}/users/${userId}/balance/current`);
-
-                        // Create the document if it doesn't exist
-                        const docSnap = await getDoc(balanceDocRef);
-                        if (!docSnap.exists()) {
-                            await setDoc(balanceDocRef, { value: 0.0 });
-                        }
-
-                        onSnapshot(balanceDocRef, (docSnap) => {
+                        
+                        // Set up a real-time listener for the user's balance
+                        const userBalanceDocRef = doc(db, `/artifacts/${appId}/users/${userId}/balance/current`);
+                        onSnapshot(userBalanceDocRef, (docSnap) => {
                             if (docSnap.exists()) {
-                                const newBalance = docSnap.data().value;
-                                updateBalanceUI(newBalance);
+                                const data = docSnap.data();
+                                updateBalanceUI(data.value);
                             } else {
-                                updateBalanceUI(0.0);
-                                console.log("Balance document not found. Initializing...");
+                                // If the balance document doesn't exist, create it with a starting balance of 0
+                                setDoc(userBalanceDocRef, { value: 0 });
                             }
-                        }, (error) => {
-                            console.error("Error fetching balance data:", error);
                         });
 
+                        // Set up a real-time listener for the user's profile
+                        const userProfileDocRef = doc(db, `/artifacts/${appId}/users/${userId}/profile/info`);
+                        onSnapshot(userProfileDocRef, (docSnap) => {
+                            if (docSnap.exists()) {
+                                const data = docSnap.data();
+                                if (data.name) {
+                                    userName = data.name;
+                                    welcomeMessage.textContent = `مرحباً ${userName}!`;
+                                }
+                            }
+                        });
+                        
                     } else {
                         // User is signed out
-                        loginScreen.classList.remove('hidden');
-                        mainApp.classList.add('hidden');
+                        console.log("User is not authenticated. Showing login screen.");
                         userId = null;
                         userEmail = null;
                         userName = null;
-                        updateBalanceUI(0.0);
+                        userIdPopup.textContent = 'غير متصل';
+                        userEmailPopup.textContent = 'غير متصل';
+                        welcomeMessage.textContent = 'مرحباً بك!';
+                        loginScreen.classList.remove('hidden');
+                        mainApp.classList.add('hidden');
+                        updateBalanceUI(0);
                     }
                 });
             } catch (error) {
-                console.error("Firebase initialization or authentication error:", error);
-                showMessage(authStatusMessageElement, 'حدث خطأ في الاتصال. يرجى تحديث الصفحة.', true);
+                console.error("Firebase initialization or authentication failed:", error);
+                showMessage(authStatusMessageElement, `فشل الاتصال بالخدمة. يرجى المحاولة لاحقاً.`, true);
             }
-        }
-
-        // Start the application
-        window.onload = function() {
-            initializeFirebase();
         };
-
     </script>
 </body>
 </html>

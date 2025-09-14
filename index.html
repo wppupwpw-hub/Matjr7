@@ -380,6 +380,12 @@
             try {
                 const credential = GoogleAuthProvider.credential(response.credential);
                 await signInWithCredential(auth, credential);
+                
+                // Directly close the login/signup screens and show the main app
+                loginScreen.classList.add('hidden');
+                signupPopup.classList.add('hidden');
+                mainApp.classList.remove('hidden');
+
                 showMessage(authStatusMessageElement, 'تم تسجيل الدخول بنجاح!');
             } catch (error) {
                 console.error('Google Sign-In Error:', error);

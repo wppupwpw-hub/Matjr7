@@ -381,8 +381,12 @@
                 const credential = GoogleAuthProvider.credential(response.credential);
                 await signInWithCredential(auth, credential);
                 
-                // No longer need to manually manage the screen transition here,
-                // as the onAuthStateChanged listener will handle it.
+                // Directly manage the screen transition after successful sign-in
+                if (auth.currentUser) {
+                    loginScreen.classList.add('hidden');
+                    signupPopup.classList.add('hidden');
+                    mainApp.classList.remove('hidden');
+                }
                 showMessage(authStatusMessageElement, 'تم تسجيل الدخول بنجاح!');
             } catch (error) {
                 console.error('Google Sign-In Error:', error);

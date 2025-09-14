@@ -79,7 +79,7 @@
         
         <!-- Google Sign-in Button -->
         <div id="g_id_onload" 
-             data-client_id="640635892482-ldefv7a2slqgrq09of42qpme20eumkq9.apps.googleusercontent.com"
+             data-client_id=""
              data-callback="handleCredentialResponse"
              data-auto_prompt="false">
         </div>
@@ -176,7 +176,7 @@
                     <h2 class="text-2xl font-bold text-blue-600">تفاصيل المحفظة</h2>
                     <button id="close-wallet-popup" class="text-gray-400 hover:text-gray-600 transition-all duration-300 transform hover:scale-125 focus:outline-none">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+                    </button>
                 </div>
                 
                 <div class="wallet-details-container max-h-64 overflow-y-auto mb-4 p-2 bg-gray-50/30 rounded-lg backdrop-blur-sm">
@@ -355,9 +355,6 @@
                 const credential = GoogleAuthProvider.credential(response.credential);
                 await signInWithCredential(auth, credential);
                 showMessage(authStatusMessageElement, 'تم تسجيل الدخول بنجاح!');
-                // Manually transition to main app after successful sign-in with Google
-                loginScreen.classList.add('hidden');
-                mainApp.classList.remove('hidden');
             } catch (error) {
                 console.error('Google Sign-In Error:', error);
                 showMessage(authStatusMessageElement, 'خطأ في تسجيل الدخول عبر Google. يرجى المحاولة مرة أخرى.', true);

@@ -155,6 +155,23 @@
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
+            
+            <!-- Google Sign-in for Signup Popup -->
+            <div class="g_id_signin mb-4" 
+                 data-type="standard" 
+                 data-size="large" 
+                 data-theme="outline" 
+                 data-text="signin_with"
+                 data-shape="rectangular"
+                 data-logo_alignment="left"
+                 data-width="300">
+            </div>
+            <div class="relative w-full text-center my-4">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-300"></div>
+                </div>
+                <div class="relative inline-block px-4 bg-white text-gray-500 text-sm">أو</div>
+            </div>
 
             <div class="w-full flex flex-col gap-4 mb-4">
                 <input id="name-signup-input" type="text" placeholder="الاسم الكامل" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200">
@@ -188,7 +205,7 @@
                 <button id="wallet-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-50 shadow-lg">
                     محفظتي
                 </button>
-                <button id="logout-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-300 focus:ring-opacity-50 shadow-lg">
+                <button id="logout-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-ring-red-300 focus:ring-opacity-50 shadow-lg">
                     تسجيل الخروج
                 </button>
             </div>

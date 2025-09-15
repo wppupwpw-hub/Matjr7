@@ -68,7 +68,7 @@
         </button>
         <div class="w-full text-center py-4 border-b border-gray-200">
             <h3 class="text-xl font-semibold text-gray-800">حسابي</h3>
-            <p id="authStatus" class="text-sm text-gray-500 mt-1">جاري التحقق...</p>
+            <p id="authStatus" class="text-sm text-gray-500 mt-1">يتم التحقق من حالة المصادقة...</p>
         </div>
         <button id="emailSignInBtn" class="w-full bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700 transition duration-300 hidden">
             <i class="fas fa-envelope ml-2"></i> تسجيل الدخول بالبريد
@@ -127,18 +127,42 @@
     <!-- Firebase CDN -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        /**
+         * ملاحظة مهمة جداً حول الأخطاء:
+         * الخطأ "Missing or insufficient permissions" الذي يظهر في وحدة التحكم (Console) ليس خطأ في الشيفرة البرمجية.
+         * إنه يعني أن قواعد الأمان (Firebase Security Rules) الخاصة بقاعدة بيانات Firestore لا تسمح بالوصول إلى البيانات.
+         *
+         * لتصحيح هذا الخطأ:
+         * 1. اذهب إلى لوحة تحكم مشروعك في Firebase.
+         * 2. اختر "Firestore Database" من القائمة الجانبية.
+         * 3. انتقل إلى علامة التبويب "Rules" (القواعد).
+         * 4. قم بلصق القواعد التالية في المحرر، ثم اضغط على "Publish" (نشر).
+         *
+         * ```
+         * rules_version = '2';
+         * service cloud.firestore {
+         * match /databases/{database}/documents {
+         * // هذه القاعدة تسمح للمستخدم المصادق عليه (بما في ذلك المستخدم المجهول)
+         * // بقراءة وكتابة البيانات في مساره الخاص فقط.
+         * match /artifacts/{appId}/users/{userId}/{document=**} {
+         * allow read, write: if request.auth != null && request.auth.uid == userId;
+         * }
+         * }
+         * }
+         * ```
+         * بعد تطبيق هذه القواعد، سيعمل التطبيق بشكل صحيح بعد تسجيل الدخول.
+         */
+        
         // Enable debug logging for Firebase Firestore
         setLogLevel('debug');
 
         // Global variables provided by the Canvas environment
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        // User-provided Google Client ID
         const googleClientId = '640635892482-ldefv7a2slqgrq09of42qpme20eumkq9.apps.googleusercontent.com';
 
         let app;
@@ -288,13 +312,7 @@
                     }
                 });
 
-                // Sign in with the custom token if it exists
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    // Fallback to anonymous sign-in if no custom token is available
-                    await signInAnonymously(auth);
-                }
+                // Do not automatically sign in. Let the user choose.
             } catch (error) {
                 console.error("Error initializing Firebase:", error);
                 // Even with an error, the app should continue to display,

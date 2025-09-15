@@ -165,7 +165,13 @@
 
         // Global variables provided by the Canvas environment
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        let firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+
+        // Add the provided Google Client ID to the Firebase config
+        const googleClientId = "640635892482-ldefv7a2slqgrq09of42qpme20eumkq9.apps.googleusercontent.com";
+        firebaseConfig.authDomain = "YOUR_AUTH_DOMAIN"; // Replace with your actual auth domain if needed
+        firebaseConfig.clientId = googleClientId;
+        firebaseConfig.apiKey = "YOUR_API_KEY"; // Placeholder for API key if not in config
 
         let app;
         let auth;

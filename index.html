@@ -233,43 +233,37 @@
 
     <!-- Firebase CDN -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-
-        // Enable debug logging for Firebase Firestore
-        setLogLevel('debug');
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Global variables with fallbacks for Canvas environment
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'demo-ads-app';
-        let firebaseConfig = {};
+        let firebaseConfig = {
+          apiKey: "AIzaSyBSnEYXXUHIbfqW07p0vmtbVDyUH1Um3_g",
+          authDomain: "miv00-63ca2.firebaseapp.com",
+          projectId: "miv00-63ca2",
+          storageBucket: "miv00-63ca2.firebasestorage.app",
+          messagingSenderId: "949781550299",
+          appId: "1:949781550299:web:06b1ec7ee16e53494728fe",
+          measurementId: "G-Q4BNYEY4M1"
+        };
         
-        try {
-            firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        } catch (e) {
-            console.log("Using demo Firebase config");
+        // This is a special Firebase config provided by the environment
+        if (typeof __firebase_config !== 'undefined') {
+            try {
+                const externalConfig = JSON.parse(__firebase_config);
+                firebaseConfig = { ...firebaseConfig, ...externalConfig };
+            } catch(e) {
+                console.error("Error parsing __firebase_config:", e);
+            }
         }
         
-        // Use a working demo configuration for public domains
-        if (!firebaseConfig.apiKey) {
-            firebaseConfig = {
-                apiKey: "AIzaSyBvOKTyDlMuFMhFjoMUxe1HI_DECb-J6-I",
-                authDomain: "ads-earnings-site.firebaseapp.com",
-                projectId: "ads-earnings-site",
-                storageBucket: "ads-earnings-site.appspot.com",
-                messagingSenderId: "640635892482",
-                appId: "1:640635892482:web:abc123def456ghi789",
-                authClientId: "640635892482-g9j0ltrvmoolsqu4lvneiu1bc1knqfl5.apps.googleusercontent.com"
-            };
-        }
-
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        // Configure Google Auth Provider
         const googleProvider = new GoogleAuthProvider();
         googleProvider.setCustomParameters({
             prompt: 'select_account'
@@ -707,12 +701,16 @@
         signInAnonymouslyBtn.addEventListener('click', async () => {
             showLoader(anonLoader, true);
             try {
-                await signInAnonymously(auth);
-                showMessage('تم تسجيل الدخول كزائر بنجاح!', '✅');
+                if (typeof __initial_auth_token !== 'undefined') {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                showMessage('تم تسجيل الدخول بنجاح!', '✅');
                 closeSidebar();
             } catch (error) {
                 console.error("Anonymous sign-in error:", error);
-                showMessage('حدث خطأ أثناء تسجيل الدخول كزائر. يرجى المحاولة مرة أخرى.', '❌', 'error');
+                showMessage('حدث خطأ أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى.', '❌', 'error');
             } finally {
                 showLoader(anonLoader, false);
             }
@@ -761,21 +759,6 @@
         // It's for demonstration purposes to show the wallet functionality
         walletBtn.addEventListener('click', () => {
             showMessage("هذه ميزة المحفظة. يمكنك هنا إدارة رصيدك وتحويل الأموال.", '💼', 'info');
-        });
-
-        // Add event listener for the menu button
-        document.addEventListener('DOMContentLoaded', () => {
-            const menuButton = document.getElementById('menuBtn');
-            const sidebarElement = document.getElementById('sidebar');
-            const closeButton = document.getElementById('closeBtn');
-            
-            menuButton.addEventListener('click', () => {
-                sidebarElement.classList.add('open');
-            });
-            
-            closeButton.addEventListener('click', () => {
-                sidebarElement.classList.remove('open');
-            });
         });
         
     </script>

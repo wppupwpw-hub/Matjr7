@@ -251,7 +251,7 @@
             console.log("Using demo Firebase config");
         }
         
-        // Demo configuration fallback to a working setup for public domains
+        // Use a working demo configuration for public domains
         if (!firebaseConfig.apiKey) {
             firebaseConfig = {
                 apiKey: "AIzaSyBvOKTyDlMuFMhFjoMUxe1HI_DECb-J6-I",
@@ -259,7 +259,8 @@
                 projectId: "ads-earnings-site",
                 storageBucket: "ads-earnings-site.appspot.com",
                 messagingSenderId: "640635892482",
-                appId: "1:640635892482:web:abc123def456ghi789"
+                appId: "1:640635892482:web:abc123def456ghi789",
+                authClientId: "640635892482-g9j0ltrvmoolsqu4lvneiu1bc1knqfl5.apps.googleusercontent.com"
             };
         }
 
@@ -542,6 +543,9 @@
                     break;
                 case 'auth/unauthorized-domain':
                     message = 'النطاق الحالي غير مصرح به. يرجى إضافة هذا النطاق إلى قائمة النطاقات في إعدادات Firebase Console.';
+                    break;
+                case 'auth/operation-not-allowed':
+                    message = 'عملية المصادقة غير مفعلة. يرجى تفعيل تسجيل الدخول عبر Google أو البريد الإلكتروني في إعدادات Firebase.';
                     break;
                 default:
                     message = `خطأ: ${error.message}`;

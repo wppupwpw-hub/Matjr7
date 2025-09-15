@@ -233,17 +233,18 @@
 
     <!-- Firebase CDN -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
         // Enable debug logging for Firebase Firestore
         setLogLevel('debug');
 
         // Global variables with fallbacks for Canvas environment
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'demo-ads-app';
-        const firebaseConfig = {
+        
+        let firebaseConfig = {
           apiKey: "AIzaSyBSnEYXXUHIbfqW07p0vmtbVDyUH1Um3_g",
           authDomain: "miv00-63ca2.firebaseapp.com",
           projectId: "miv00-63ca2",
@@ -253,20 +254,20 @@
           measurementId: "G-Q4BNYEY4M1"
         };
         
+        // This is a special Firebase config provided by the environment
+        if (typeof __firebase_config !== 'undefined') {
+          try {
+            const externalConfig = JSON.parse(__firebase_config);
+            firebaseConfig = { ...firebaseConfig, ...externalConfig };
+          } catch(e) {
+            console.error("Error parsing __firebase_config:", e);
+          }
+        }
+        
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        // Use the initial custom auth token if available, otherwise sign in anonymously
-        if (typeof __initial_auth_token !== 'undefined') {
-            signInWithCustomToken(auth, __initial_auth_token).catch((error) => {
-                console.error("Error signing in with custom token:", error);
-                signInAnonymously(auth); // Fallback to anonymous sign-in on error
-            });
-        } else {
-            signInAnonymously(auth);
-        }
-
         const googleProvider = new GoogleAuthProvider();
         googleProvider.setCustomParameters({
             prompt: 'select_account'
@@ -566,7 +567,7 @@
                     displayName = user.email.split('@')[0];
                 }
                 
-                authStatus.innerHTML = `<span class="text-green-600">متصل</span><br><small>${user.uid}</small>`;
+                authStatus.innerHTML = `<span class="text-green-600">متصل</span><br><small>${displayName}</small>`;
                 
                 // Show logged-in buttons, hide auth buttons
                 authButtons.classList.add('hidden');
@@ -625,21 +626,16 @@
             try {
                 const docSnap = await getDoc(userDocRef);
                 let currentBalance = 0;
-                let totalEarned = 0;
-
                 if (docSnap.exists()) {
                     currentBalance = docSnap.data().amount || 0;
-                    totalEarned = docSnap.data().totalEarned || 0;
                 }
 
                 const newBalance = currentBalance + amount;
-                const newTotalEarned = totalEarned + amount;
-
                 await setDoc(userDocRef, { 
                     amount: newBalance, 
                     lastUpdated: new Date(),
-                    totalEarned: newTotalEarned
-                }, { merge: true });
+                    totalEarned: (docSnap.exists() ? (docSnap.data().totalEarned || 0) : 0) + amount
+                });
 
                 showMessage(`🎉 تهانينا! لقد ربحت ${amount.toFixed(2)} دينار\n💰 رصيدك الجديد: ${newBalance.toFixed(2)} دينار`, '💎');
             } catch (e) {
@@ -692,6 +688,7 @@
                         watchBtn.disabled = true;
                         watchBtn.classList.add('cursor-not-allowed', 'opacity-50');
                         adCard.classList.add('opacity-60');
+                        showMessage(`تمت إضافة ${ad.reward.toFixed(2)} دينار إلى رصيدك.`, '✅');
                     }
                 });
             });
@@ -708,16 +705,12 @@
         signInAnonymouslyBtn.addEventListener('click', async () => {
             showLoader(anonLoader, true);
             try {
-                if (typeof __initial_auth_token !== 'undefined') {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-                showMessage('تم تسجيل الدخول بنجاح!', '✅');
+                await signInAnonymously(auth);
+                showMessage('تم تسجيل الدخول كزائر بنجاح!', '✅');
                 closeSidebar();
             } catch (error) {
                 console.error("Anonymous sign-in error:", error);
-                showMessage('حدث خطأ أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى.', '❌', 'error');
+                showMessage('حدث خطأ أثناء تسجيل الدخول كزائر. يرجى المحاولة مرة أخرى.', '❌', 'error');
             } finally {
                 showLoader(anonLoader, false);
             }
@@ -766,6 +759,21 @@
         // It's for demonstration purposes to show the wallet functionality
         walletBtn.addEventListener('click', () => {
             showMessage("هذه ميزة المحفظة. يمكنك هنا إدارة رصيدك وتحويل الأموال.", '💼', 'info');
+        });
+
+        // Add event listener for the menu button
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuButton = document.getElementById('menuBtn');
+            const sidebarElement = document.getElementById('sidebar');
+            const closeButton = document.getElementById('closeBtn');
+            
+            menuButton.addEventListener('click', () => {
+                sidebarElement.classList.add('open');
+            });
+            
+            closeButton.addEventListener('click', () => {
+                sidebarElement.classList.remove('open');
+            });
         });
         
     </script>

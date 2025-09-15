@@ -68,16 +68,20 @@
         </button>
         <div class="w-full text-center py-4 border-b border-gray-200">
             <h3 class="text-xl font-semibold text-gray-800">حسابي</h3>
-            <p id="authStatus" class="text-sm text-gray-500 mt-1">يتم التحقق من حالة المصادقة...</p>
+            <p id="authStatus" class="text-sm text-gray-500 mt-1">غير متصل</p>
         </div>
-        <button id="emailSignInBtn" class="w-full bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700 transition duration-300 hidden">
+        <!-- Guest sign-in button -->
+        <button id="signInAnonymouslyBtn" class="w-full bg-gray-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-gray-600 transition duration-300">
+            <i class="fas fa-user-circle ml-2"></i> تسجيل الدخول كزائر
+        </button>
+        <button id="emailSignInBtn" class="w-full bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700 transition duration-300">
             <i class="fas fa-envelope ml-2"></i> تسجيل الدخول بالبريد
         </button>
-        <button id="emailSignUpBtn" class="w-full bg-green-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-green-700 transition duration-300 hidden">
+        <button id="emailSignUpBtn" class="w-full bg-green-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-green-700 transition duration-300">
             <i class="fas fa-user-plus ml-2"></i> إنشاء حساب بالبريد
         </button>
         <!-- Google Sign-in Button -->
-        <button id="googleSignInBtn" class="w-full bg-red-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-red-600 transition duration-300 flex items-center justify-center space-x-2 space-x-reverse hidden">
+        <button id="googleSignInBtn" class="w-full bg-red-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-red-600 transition duration-300 flex items-center justify-center space-x-2 space-x-reverse">
             <i class="fab fa-google ml-2"></i> تسجيل الدخول عبر غوغل
         </button>
         <button id="walletBtn" class="w-full bg-purple-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-purple-700 transition duration-300 hidden">
@@ -126,7 +130,7 @@
     <!-- Firebase CDN -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
@@ -162,18 +166,16 @@
         // Global variables provided by the Canvas environment
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         let app;
         let auth;
         let db;
-        let userId; // This variable is no longer needed but kept for clarity
-        let isAuthReady = false;
 
         // Get UI elements
         const menuBtn = document.getElementById('menuBtn');
         const sidebar = document.getElementById('sidebar');
         const closeBtn = document.getElementById('closeBtn');
+        const signInAnonymouslyBtn = document.getElementById('signInAnonymouslyBtn');
         const emailSignInBtn = document.getElementById('emailSignInBtn');
         const emailSignUpBtn = document.getElementById('emailSignUpBtn');
         const googleSignInBtn = document.getElementById('googleSignInBtn');
@@ -253,7 +255,7 @@
                 let message = 'حدث خطأ في المصادقة.';
                 if (error.code === 'auth/email-already-in-use') {
                     message = 'هذا البريد الإلكتروني مستخدم بالفعل.';
-                } else if (error.code === 'auth/invalid-credential') {
+                } else if (error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-login-credentials') {
                     message = 'البيانات غير صحيحة. يرجى التحقق من البريد وكلمة المرور.';
                 } else if (error.code === 'auth/weak-password') {
                     message = 'كلمة المرور ضعيفة جدًا.';
@@ -274,17 +276,17 @@
 
                 // Listen for authentication state changes
                 onAuthStateChanged(auth, async (user) => {
-                    isAuthReady = true;
                     if (user) {
                         // User is signed in.
                         const displayName = user.displayName || user.email || 'مستخدم مسجل';
                         authStatus.textContent = `مرحباً، ${displayName}!`;
                         signOutBtn.classList.remove('hidden');
                         walletBtn.classList.remove('hidden');
+                        signInAnonymouslyBtn.classList.add('hidden');
                         emailSignInBtn.classList.add('hidden');
                         emailSignUpBtn.classList.add('hidden');
                         googleSignInBtn.classList.add('hidden');
-                        setupRealtimeListener();
+                        setupRealtimeListener(user.uid);
                     } else {
                         // User is signed out.
                         authStatus.textContent = 'غير متصل';
@@ -292,6 +294,7 @@
                         userBalanceSpan.textContent = '0.00 دينار';
                         signOutBtn.classList.add('hidden');
                         walletBtn.classList.add('hidden');
+                        signInAnonymouslyBtn.classList.remove('hidden');
                         emailSignInBtn.classList.remove('hidden');
                         emailSignUpBtn.classList.remove('hidden');
                         googleSignInBtn.classList.remove('hidden');
@@ -305,13 +308,13 @@
         }
 
         // Sets up a real-time listener for the user's balance
-        function setupRealtimeListener() {
-            if (!auth.currentUser || !db || !isAuthReady) {
+        function setupRealtimeListener(uid) {
+            if (!uid || !db) {
                 console.error("Firebase or user not ready for listener.");
                 return;
             }
 
-            const userDocRef = doc(db, `artifacts/${appId}/users/${auth.currentUser.uid}/user_data/balance`);
+            const userDocRef = doc(db, `artifacts/${appId}/users/${uid}/user_data/balance`);
 
             onSnapshot(userDocRef, (docSnap) => {
                 if (docSnap.exists()) {
@@ -401,6 +404,17 @@
         });
 
         // Auth button event listeners
+        signInAnonymouslyBtn.addEventListener('click', async () => {
+            try {
+                await signInAnonymously(auth);
+                showMessage('تم تسجيل الدخول كزائر بنجاح. يمكنك الآن مشاهدة الإعلانات.');
+                sidebar.classList.remove('open');
+            } catch (error) {
+                console.error("Anonymous sign-in error:", error);
+                showMessage('فشل تسجيل الدخول كزائر. يرجى المحاولة مرة أخرى.');
+            }
+        });
+
         emailSignInBtn.addEventListener('click', () => {
             showAuthModal('signIn');
         });
@@ -414,6 +428,7 @@
             try {
                 await signInWithPopup(auth, provider);
                 showMessage('تم تسجيل الدخول بنجاح باستخدام غوغل.');
+                sidebar.classList.remove('open');
             } catch (error) {
                 console.error("Google Sign-in error:", error);
                 let message = 'حدث خطأ في المصادقة عبر غوغل.';
@@ -450,6 +465,7 @@
             try {
                 await signOut(auth);
                 showMessage('تم تسجيل خروجك بنجاح.');
+                sidebar.classList.remove('open');
             } catch (error) {
                 console.error("Sign out error:", error);
                 showMessage('فشل تسجيل الخروج.');

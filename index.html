@@ -92,7 +92,6 @@
         <div class="bg-white p-6 rounded-xl shadow-lg mb-6">
             <h2 class="text-2xl font-bold text-gray-700 mb-2">رصيدك الحالي</h2>
             <p class="text-4xl font-extrabold text-blue-600"><span id="balanceDisplay">0.00</span> دينار</p>
-            <p id="userIdDisplay" class="text-sm text-gray-500 mt-2 text-right">معرف المستخدم: <span id="userIdValue">...</span></p>
         </div>
 
         <h2 class="text-2xl font-bold text-gray-700 mb-4">شاهد الإعلانات واكسب</h2>
@@ -164,12 +163,11 @@
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        const googleClientId = '640635892482-ldefv7a2slqgrq09of42qpme20eumkq9.apps.googleusercontent.com';
 
         let app;
         let auth;
         let db;
-        let userId;
+        let userId; // This variable is no longer needed but kept for clarity
         let isAuthReady = false;
 
         // Get UI elements
@@ -185,7 +183,6 @@
 
         const balanceDisplay = document.getElementById('balanceDisplay');
         const userBalanceSpan = document.getElementById('userBalance');
-        const userIdDisplay = document.getElementById('userIdValue');
         const adsContainer = document.getElementById('adsContainer');
 
         const modal = document.getElementById('modal');
@@ -279,20 +276,9 @@
                 onAuthStateChanged(auth, async (user) => {
                     isAuthReady = true;
                     if (user) {
-                        userId = user.uid;
-                        // Determine display name based on auth provider
-                        let displayName = 'مستخدم مجهول';
-                        if (user.providerData && user.providerData.length > 0) {
-                            const providerId = user.providerData[0].providerId;
-                            if (providerId === 'google.com') {
-                                displayName = user.displayName || 'مستخدم غوغل';
-                            } else if (user.email) {
-                                displayName = user.email;
-                            }
-                        }
-                        
+                        // User is signed in.
+                        const displayName = user.displayName || user.email || 'مستخدم مسجل';
                         authStatus.textContent = `مرحباً، ${displayName}!`;
-                        userIdDisplay.textContent = userId;
                         signOutBtn.classList.remove('hidden');
                         walletBtn.classList.remove('hidden');
                         emailSignInBtn.classList.add('hidden');
@@ -300,9 +286,8 @@
                         googleSignInBtn.classList.add('hidden');
                         setupRealtimeListener();
                     } else {
-                        userId = null;
+                        // User is signed out.
                         authStatus.textContent = 'غير متصل';
-                        userIdDisplay.textContent = '...';
                         balanceDisplay.textContent = '0.00';
                         userBalanceSpan.textContent = '0.00 دينار';
                         signOutBtn.classList.add('hidden');
@@ -321,12 +306,12 @@
 
         // Sets up a real-time listener for the user's balance
         function setupRealtimeListener() {
-            if (!userId || !db || !isAuthReady) {
+            if (!auth.currentUser || !db || !isAuthReady) {
                 console.error("Firebase or user not ready for listener.");
                 return;
             }
 
-            const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/user_data/balance`);
+            const userDocRef = doc(db, `artifacts/${appId}/users/${auth.currentUser.uid}/user_data/balance`);
 
             onSnapshot(userDocRef, (docSnap) => {
                 if (docSnap.exists()) {
@@ -345,12 +330,12 @@
 
         // Updates the user's balance in Firestore
         async function updateBalance(amount) {
-            if (!userId || !db) {
+            if (!auth.currentUser || !db) {
                 showMessage('خطأ: المستخدم غير مسجل الدخول.');
                 return;
             }
 
-            const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/user_data/balance`);
+            const userDocRef = doc(db, `artifacts/${appId}/users/${auth.currentUser.uid}/user_data/balance`);
 
             try {
                 // Get the current balance
@@ -395,7 +380,7 @@
             // Attach event listeners to the new buttons
             document.querySelectorAll('.watch-ad-btn').forEach(button => {
                 button.addEventListener('click', async (event) => {
-                    if (!userId) {
+                    if (!auth.currentUser) {
                         showMessage('يجب تسجيل الدخول أولاً للمتابعة.');
                         return;
                     }
@@ -443,7 +428,7 @@
 
         // Wallet button logic (simulated withdrawal)
         walletBtn.addEventListener('click', async () => {
-            if (!userId) {
+            if (!auth.currentUser) {
                 showMessage('يجب تسجيل الدخول أولاً للوصول إلى المحفظة.');
                 return;
             }
@@ -452,7 +437,7 @@
             if (currentBalance >= 100) {
                 // This is a simplified, simulated withdrawal process.
                 // In a real application, this would involve external payment APIs.
-                const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/user_data/balance`);
+                const userDocRef = doc(db, `artifacts/${appId}/users/${auth.currentUser.uid}/user_data/balance`);
                 await setDoc(userDocRef, { amount: currentBalance - 100, lastUpdated: new Date() });
                 showMessage(`تمت محاكاة سحب 100 دينار بنجاح. رصيدك المتبقي هو ${ (currentBalance - 100).toFixed(2) } دينار.`);
             } else {

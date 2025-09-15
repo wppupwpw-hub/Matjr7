@@ -3,786 +3,461 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شاهد واربح</title>
+    <title>موقع إعلانات لكسب الدنانير</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts for a clean font -->
+    <!-- Use Inter font from Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Google Identity Services -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         body {
-            font-family: 'Cairo', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
         }
-        /* Custom scrollbar style for the wallet details */
-        .wallet-details-container::-webkit-scrollbar {
-            width: 8px;
+        .ad-card {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease-in-out;
         }
-        .wallet-details-container::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
+        .ad-card:hover {
+            transform: translateY(-5px);
         }
-        .wallet-details-container::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 10px;
+        #sidebar {
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(100%);
         }
-        .wallet-details-container::-webkit-scrollbar-thumb:hover {
-            background: #555;
+        #sidebar.open {
+            transform: translateX(0);
         }
-        .glass-effect {
-            backdrop-filter: blur(20px);
-            background: rgba(255, 255, 255, 0.95);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .loading-spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #3498db;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            margin-left: 8px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .success-animation {
-            animation: successPulse 0.6s ease-in-out;
-        }
-        @keyframes successPulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        .error-shake {
-            animation: shake 0.5s ease-in-out;
-        }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+        /* Style for modals to ensure they are centered and visible */
+        .modal-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
         }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
+<body class="bg-gray-100 flex flex-col min-h-screen">
+    <header class="bg-white shadow-md p-4">
+        <nav class="container mx-auto flex justify-between items-center">
+            <h1 class="text-3xl font-bold text-gray-800">موقع الإعلانات</h1>
+            <div class="flex items-center space-x-4 space-x-reverse">
+                <div class="flex items-center space-x-2 space-x-reverse">
+                    <span id="userBalance" class="text-xl font-semibold text-green-600">0.00 دينار</span>
+                </div>
+                <button id="menuBtn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-full font-semibold hover:bg-gray-300 transition duration-300">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </nav>
+    </header>
 
-    <!-- Login screen -->
-    <div id="login-screen" class="glass-effect flex flex-col items-center justify-center text-center p-8 rounded-2xl shadow-2xl w-full max-w-sm">
-        <h1 class="text-4xl font-extrabold text-blue-600 mb-4">أهلاً بك في شاهد واربح!</h1>
-        <p class="text-lg text-gray-600 mb-8">قم بتسجيل الدخول أو أنشئ حسابًا جديدًا.</p>
-        
+    <!-- Side Menu -->
+    <div id="sidebar" class="fixed inset-y-0 right-0 w-64 bg-white shadow-xl z-50 p-6 flex flex-col justify-start items-center space-y-4">
+        <button id="closeBtn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+            <i class="fas fa-times text-2xl"></i>
+        </button>
+        <div class="w-full text-center py-4 border-b border-gray-200">
+            <h3 class="text-xl font-semibold text-gray-800">حسابي</h3>
+            <p id="authStatus" class="text-sm text-gray-500 mt-1">جاري التحقق...</p>
+        </div>
+        <button id="emailSignInBtn" class="w-full bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700 transition duration-300 hidden">
+            <i class="fas fa-envelope ml-2"></i> تسجيل الدخول بالبريد
+        </button>
+        <button id="emailSignUpBtn" class="w-full bg-green-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-green-700 transition duration-300 hidden">
+            <i class="fas fa-user-plus ml-2"></i> إنشاء حساب بالبريد
+        </button>
         <!-- Google Sign-in Button -->
-        <div id="g_id_onload" 
-             data-client_id=""
-             data-callback="handleCredentialResponse"
-             data-auto_prompt="false">
-        </div>
-        <div class="g_id_signin mb-4" 
-             data-type="standard" 
-             data-size="large" 
-             data-theme="outline" 
-             data-text="signin_with"
-             data-shape="rectangular"
-             data-logo_alignment="left"
-             data-width="300">
-        </div>
-
-        <div class="relative w-full text-center my-4">
-            <div class="absolute inset-0 flex items-center">
-                <div class="w-full border-t border-gray-300"></div>
-            </div>
-            <div class="relative inline-block px-4 bg-white text-gray-500 text-sm">أو</div>
-        </div>
-        
-        <div class="w-full flex flex-col gap-4 mb-4">
-            <input id="email-input" type="email" placeholder="البريد الإلكتروني" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200">
-            <input id="password-input" type="password" placeholder="كلمة المرور" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200">
-        </div>
-
-        <button id="email-signin-button" class="w-full flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-50 shadow-lg mb-4">
-            <span id="signin-text">تسجيل الدخول</span>
-            <div id="signin-spinner" class="loading-spinner hidden"></div>
+        <button id="googleSignInBtn" class="w-full bg-red-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-red-600 transition duration-300 flex items-center justify-center space-x-2 space-x-reverse hidden">
+            <i class="fab fa-google ml-2"></i> تسجيل الدخول عبر غوغل
         </button>
-
-        <button id="signup-button" class="w-full flex items-center justify-center bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-green-300 focus:ring-opacity-50 shadow-lg">
-            إنشاء حساب جديد
+        <button id="walletBtn" class="w-full bg-purple-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-purple-700 transition duration-300 hidden">
+            <i class="fas fa-wallet ml-2"></i> محفظتي
         </button>
-
-        <p id="auth-status-message" class="mt-4 text-sm text-gray-600 h-5"></p>
+        <button id="signOutBtn" class="w-full bg-red-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-red-600 transition duration-300 hidden">
+            <i class="fas fa-sign-out-alt ml-2"></i> تسجيل الخروج
+        </button>
     </div>
 
-    <!-- Signup Popup -->
-    <div id="signup-popup" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
-        <div class="glass-effect p-8 rounded-2xl shadow-2xl w-full max-w-sm text-center">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-2xl font-bold text-green-600">إنشاء حساب جديد</h2>
-                <button id="close-signup-popup" class="text-gray-400 hover:text-gray-600 transition-all duration-300 transform hover:scale-125 focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-            
-            <div class="w-full flex flex-col gap-4 mb-4">
-                <input id="name-signup-input" type="text" placeholder="الاسم الكامل" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200">
-                <input id="email-signup-input" type="email" placeholder="البريد الإلكتروني" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200">
-                <input id="password-signup-input" type="password" placeholder="كلمة المرور (6 أحرف على الأقل)" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200">
-                <input id="confirm-password-input" type="password" placeholder="تأكيد كلمة المرور" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200">
-            </div>
-            
-            <!-- Terms and Conditions -->
-            <div class="flex items-center mb-4">
-                <input id="terms-checkbox" type="checkbox" class="mr-2 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
-                <label for="terms-checkbox" class="text-sm text-gray-700">أوافق على <a href="#" class="text-green-600 underline">الشروط والأحكام</a></label>
-            </div>
-            
-            <button id="confirm-signup-button" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-green-300 focus:ring-opacity-50 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
-                <span id="signup-text">إنشاء حساب</span>
-                <div id="signup-spinner" class="loading-spinner hidden"></div>
-            </button>
-            <p id="signup-status-message" class="mt-4 text-sm text-gray-600 h-5"></p>
+    <main class="container mx-auto my-8 p-4 flex-grow">
+        <div class="bg-white p-6 rounded-xl shadow-lg mb-6">
+            <h2 class="text-2xl font-bold text-gray-700 mb-2">رصيدك الحالي</h2>
+            <p class="text-4xl font-extrabold text-blue-600"><span id="balanceDisplay">0.00</span> دينار</p>
+            <p id="userIdDisplay" class="text-sm text-gray-500 mt-2 text-right">معرف المستخدم: <span id="userIdValue">...</span></p>
+        </div>
+
+        <h2 class="text-2xl font-bold text-gray-700 mb-4">شاهد الإعلانات واكسب</h2>
+        <div id="adsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Ad cards will be inserted here by JavaScript -->
+        </div>
+    </main>
+
+    <!-- Modal for messages -->
+    <div id="modal" class="modal-container">
+        <div class="bg-white p-8 rounded-lg shadow-xl text-center">
+            <p id="modalMessage" class="text-lg font-semibold mb-4"></p>
+            <button id="modalCloseButton" class="bg-blue-600 text-white px-4 py-2 rounded-lg">إغلاق</button>
         </div>
     </div>
 
-    <!-- Main Card Container (initially hidden) -->
-    <div id="main-app" class="hidden glass-effect p-8 rounded-2xl shadow-2xl text-center w-full max-w-md">
-
-        <!-- Header with Title and Wallet Button -->
-        <div class="flex items-center justify-between mb-6">
-            <div class="flex flex-col items-start">
-                <h1 class="text-4xl font-extrabold text-blue-600">شاهد واربح</h1>
-                <p id="welcome-message" class="text-sm text-gray-600 mt-1">مرحباً بك!</p>
-            </div>
-            <div class="flex gap-2">
-                <button id="wallet-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-50 shadow-lg">
-                    محفظتي
-                </button>
-                <button id="logout-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-300 focus:ring-opacity-50 shadow-lg">
-                    تسجيل الخروج
-                </button>
-            </div>
-        </div>
-
-        <p class="text-gray-600 mb-6">شاهد إعلانات قصيرة واكسب المال بسهولة!</p>
-        
-        <!-- Wallet Details Popup -->
-        <div id="wallet-popup" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
-            <div class="glass-effect p-6 rounded-2xl shadow-2xl w-full max-w-sm text-center">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-2xl font-bold text-blue-600">تفاصيل المحفظة</h2>
-                    <button id="close-wallet-popup" class="text-gray-400 hover:text-gray-600 transition-all duration-300 transform hover:scale-125 focus:outline-none">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
-                </div>
-                
-                <div class="wallet-details-container max-h-64 overflow-y-auto mb-4 p-2 bg-gray-50/30 rounded-lg backdrop-blur-sm">
-                    <div class="bg-blue-50/50 p-4 rounded-xl shadow-inner mb-4 backdrop-blur-sm">
-                        <p class="text-lg font-semibold text-gray-700">رصيدك الحالي:</p>
-                        <p id="balance-popup" class="text-4xl font-extrabold text-green-600 mt-2">$0.00</p>
-                    </div>
-                    <div class="bg-gray-100/50 p-4 rounded-xl shadow-inner backdrop-blur-sm">
-                        <p class="text-sm font-semibold text-gray-700">معرف المستخدم:</p>
-                        <p id="user-id-popup" class="text-sm text-gray-800 mt-2 break-all"></p>
-                        <p class="text-sm font-semibold text-gray-700 mt-2">البريد الإلكتروني:</p>
-                        <p id="user-email-popup" class="text-sm text-gray-800 mt-1 break-all"></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Current Balance Section -->
-        <div class="mb-6 bg-blue-50/30 p-4 rounded-xl shadow-inner backdrop-blur-sm">
-            <p class="text-lg font-semibold text-gray-700">رصيدك الحالي:</p>
-            <p id="balance" class="text-5xl font-extrabold text-green-600 mt-2 transition-all duration-500 ease-in-out transform scale-100">$0.00</p>
-        </div>
-
-        <!-- Ad Placeholder / Video Player -->
-        <div id="ad-container" class="w-full h-48 bg-gray-200/30 rounded-xl overflow-hidden mb-6 flex items-center justify-center shadow-md backdrop-blur-sm">
-            <img id="ad-image" src="https://placehold.co/400x200/e5e7eb/6b7280?text=جاري+التحميل..." alt="Ad Placeholder" class="w-full h-full object-cover rounded-xl">
-        </div>
-        
-        <!-- Action Buttons Container -->
-        <div class="flex flex-col sm:flex-row gap-4">
-            <button id="watch-button" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-50 shadow-lg">
-                شاهد إعلان ($0.01)
+    <!-- Modal for Email/Password forms -->
+    <div id="authModal" class="modal-container">
+        <div class="bg-white p-8 rounded-lg shadow-xl text-center w-80">
+            <h3 id="authModalTitle" class="text-2xl font-bold mb-4"></h3>
+            <input type="email" id="authEmail" placeholder="البريد الإلكتروني" class="w-full p-3 mb-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <input type="password" id="authPassword" placeholder="كلمة المرور" class="w-full p-3 mb-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button id="authSubmitBtn" class="w-full bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700 transition duration-300">
+                تأكيد
             </button>
-            <button id="skip-button" class="flex-1 bg-gray-400 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-gray-300 focus:ring-opacity-50 shadow-lg">
-                تخطي الإعلان
+            <button id="authModalCloseBtn" class="w-full mt-4 text-gray-600 hover:text-gray-800">
+                إلغاء
             </button>
         </div>
-
-        <!-- Status Message -->
-        <p id="status-message" class="mt-4 text-sm text-gray-600 h-5"></p>
-
     </div>
 
-    <!-- Firebase Scripts -->
+    <!-- Firebase CDN -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signInWithCustomToken, GoogleAuthProvider, signInWithCredential, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        
-        // =====================================
-        // إعدادات Google Client ID
-        // =====================================
-        // أضف Google Client ID الخاص بك هنا من Google Cloud Console
-        // للحصول على Client ID: https://console.cloud.google.com/
-        // 1. إنشاء مشروع جديد أو اختيار مشروع موجود
-        // 2. تفعيل Google Identity API
-        // 3. إنشاء OAuth 2.0 Client ID من نوع "Web application"
-        // 4. إضافة الدومين الخاص بك إلى "Authorized origins"
-        const GOOGLE_CLIENT_ID = '640635892482-ldefv7a2slqgrq09of42qpme20eumkq9.apps.googleusercontent.com'; // ضع Client ID هنا
-        // =====================================
-        
-        // IMPORTANT: Global variables are provided by the Canvas environment.
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Enable debug logging for Firebase Firestore
+        setLogLevel('debug');
+
+        // Global variables provided by the Canvas environment
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // User-provided Google Client ID
+        const googleClientId = '640635892482-ldefv7a2slqgrq09of42qpme20eumkq9.apps.googleusercontent.com';
 
-        // Get the necessary HTML elements
-        const loginScreen = document.getElementById('login-screen');
-        const mainApp = document.getElementById('main-app');
-        const balanceElement = document.getElementById('balance');
-        const walletButton = document.getElementById('wallet-button');
-        const logoutButton = document.getElementById('logout-button');
-        const walletPopup = document.getElementById('wallet-popup');
-        const closeWalletPopup = document.getElementById('close-wallet-popup');
-        const balancePopup = document.getElementById('balance-popup');
-        const userIdPopup = document.getElementById('user-id-popup');
-        const userEmailPopup = document.getElementById('user-email-popup');
-        const welcomeMessage = document.getElementById('welcome-message');
-        const watchButton = document.getElementById('watch-button');
-        const skipButton = document.getElementById('skip-button');
-        const statusMessageElement = document.getElementById('status-message');
-        const authStatusMessageElement = document.getElementById('auth-status-message');
-        const adImageElement = document.getElementById('ad-image');
-        const emailSignInButton = document.getElementById('email-signin-button');
-        const emailInput = document.getElementById('email-input');
-        const passwordInput = document.getElementById('password-input');
-        
-        // Signup elements
-        const signupButton = document.getElementById('signup-button');
-        const signupPopup = document.getElementById('signup-popup');
-        const closeSignupPopup = document.getElementById('close-signup-popup');
-        const nameSignupInput = document.getElementById('name-signup-input');
-        const emailSignupInput = document.getElementById('email-signup-input');
-        const passwordSignupInput = document.getElementById('password-signup-input');
-        const confirmPasswordInput = document.getElementById('confirm-password-input');
-        const termsCheckbox = document.getElementById('terms-checkbox');
-        const confirmSignupButton = document.getElementById('confirm-signup-button');
-        const signupStatusMessageElement = document.getElementById('signup-status-message');
+        let app;
+        let auth;
+        let db;
+        let userId;
+        let isAuthReady = false;
 
-        // Loading elements
-        const signinSpinner = document.getElementById('signin-spinner');
-        const signinText = document.getElementById('signin-text');
-        const signupSpinner = document.getElementById('signup-spinner');
-        const signupText = document.getElementById('signup-text');
+        // Get UI elements
+        const menuBtn = document.getElementById('menuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const closeBtn = document.getElementById('closeBtn');
+        const emailSignInBtn = document.getElementById('emailSignInBtn');
+        const emailSignUpBtn = document.getElementById('emailSignUpBtn');
+        const googleSignInBtn = document.getElementById('googleSignInBtn');
+        const walletBtn = document.getElementById('walletBtn');
+        const signOutBtn = document.getElementById('signOutBtn');
+        const authStatus = document.getElementById('authStatus');
 
-        // Initial state
-        let currentBalance = 0;
-        const watchReward = 0.01;
-        const adDuration = 5000;
-        let isAdPlaying = false;
-        let adTimer = null;
-        let db, auth;
-        let userId, userEmail, userName;
+        const balanceDisplay = document.getElementById('balanceDisplay');
+        const userBalanceSpan = document.getElementById('userBalance');
+        const userIdDisplay = document.getElementById('userIdValue');
+        const adsContainer = document.getElementById('adsContainer');
 
-        // Array of placeholder ad images
-        const adImages = [
-            "https://placehold.co/400x200/c7d2fe/3730a3?text=إعلان+1",
-            "https://placehold.co/400x200/bae6fd/0369a1?text=إعلان+2",
-            "https://placehold.co/400x200/d1fae5/065f46?text=إعلان+3"
+        const modal = document.getElementById('modal');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalCloseButton = document.getElementById('modalCloseButton');
+
+        const authModal = document.getElementById('authModal');
+        const authModalTitle = document.getElementById('authModalTitle');
+        const authEmail = document.getElementById('authEmail');
+        const authPassword = document.getElementById('authPassword');
+        const authSubmitBtn = document.getElementById('authSubmitBtn');
+        const authModalCloseBtn = document.getElementById('authModalCloseBtn');
+
+        // Dummy ads data
+        const ads = [
+            { id: 1, title: 'إعلان لسيارة فاخرة', imageUrl: 'https://placehold.co/400x250/333333/ffffff?text=Car+Ad', reward: 0.50, description: 'شاهد إعلانًا لسيارة جديدة واكسب 0.50 دينار.' },
+            { id: 2, title: 'تطبيق جديد', imageUrl: 'https://placehold.co/400x250/1d4ed8/ffffff?text=App+Ad', reward: 0.25, description: 'اكسب 0.25 دينار بمشاهدة إعلان عن تطبيق جديد.' },
+            { id: 3, title: 'أحذية رياضية', imageUrl: 'https://placehold.co/400x250/22c55e/ffffff?text=Shoes+Ad', reward: 0.75, description: 'شاهد إعلانًا عن أحدث الأحذية الرياضية واكسب 0.75 دينار.' },
+            { id: 4, title: 'مأكولات ومشروبات', imageUrl: 'https://placehold.co/400x250/f97316/ffffff?text=Food+%26+Drinks', reward: 0.40, description: 'احصل على 0.40 دينار لمشاهدة هذا الإعلان.' },
         ];
-        let currentAdIndex = 0;
 
-        // Validation functions
-        function validateEmail(email) {
-            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return re.test(email);
+        // --- Helper Functions ---
+        
+        // Displays a custom modal message
+        function showMessage(message) {
+            modalMessage.textContent = message;
+            modal.style.display = 'flex';
         }
 
-        function validatePassword(password) {
-            return password.length >= 6;
-        }
+        modalCloseButton.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
 
-        function validateName(name) {
-            return name.trim().length >= 2;
-        }
-
-        // Show loading state
-        function showLoadingState(isSignin = true) {
-            if (isSignin) {
-                signinSpinner.classList.remove('hidden');
-                signinText.textContent = 'جاري تسجيل الدخول...';
-                emailSignInButton.disabled = true;
+        // Shows the email/password authentication modal
+        function showAuthModal(type) {
+            authEmail.value = '';
+            authPassword.value = '';
+            if (type === 'signIn') {
+                authModalTitle.textContent = 'تسجيل الدخول';
+                authSubmitBtn.textContent = 'تسجيل الدخول';
+                authSubmitBtn.onclick = () => handleEmailAuth(signInWithEmailAndPassword);
             } else {
-                signupSpinner.classList.remove('hidden');
-                signupText.textContent = 'جاري إنشاء الحساب...';
-                confirmSignupButton.disabled = true;
+                authModalTitle.textContent = 'إنشاء حساب';
+                authSubmitBtn.textContent = 'إنشاء حساب';
+                authSubmitBtn.onclick = () => handleEmailAuth(createUserWithEmailAndPassword);
             }
+            authModal.style.display = 'flex';
         }
 
-        // Hide loading state
-        function hideLoadingState(isSignin = true) {
-            if (isSignin) {
-                signinSpinner.classList.add('hidden');
-                signinText.textContent = 'تسجيل الدخول';
-                emailSignInButton.disabled = false;
-            } else {
-                signupSpinner.classList.add('hidden');
-                signupText.textContent = 'إنشاء حساب';
-                confirmSignupButton.disabled = false;
-            }
-        }
-
-        // Show message with animation
-        function showMessage(element, message, isError = false) {
-            element.textContent = message;
-            element.className = isError ? 'mt-4 text-sm text-red-600 h-5 error-shake' : 'mt-4 text-sm text-green-600 h-5 success-animation';
-            
-            setTimeout(() => {
-                element.className = 'mt-4 text-sm text-gray-600 h-5';
-            }, 3000);
-        }
-
-        // Google Sign-In callback
-        window.handleCredentialResponse = async function(response) {
-            try {
-                const credential = GoogleAuthProvider.credential(response.credential);
-                await signInWithCredential(auth, credential);
-                showMessage(authStatusMessageElement, 'تم تسجيل الدخول بنجاح!');
-            } catch (error) {
-                console.error('Google Sign-In Error:', error);
-                showMessage(authStatusMessageElement, 'خطأ في تسجيل الدخول عبر Google. يرجى المحاولة مرة أخرى.', true);
-            }
-        };
-
-        // Initialize Google Sign-In
-        function initializeGoogleSignIn() {
-            if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== 'YOUR_GOOGLE_CLIENT_ID_HERE') {
-                console.log('تهيئة Google Sign-In مع Client ID:', GOOGLE_CLIENT_ID);
-                
-                const onloadDiv = document.getElementById('g_id_onload');
-                onloadDiv.setAttribute('data-client_id', GOOGLE_CLIENT_ID);
-                
-                // Wait for Google library to load
-                const checkGoogleLoaded = () => {
-                    if (window.google && window.google.accounts) {
-                        try {
-                            google.accounts.id.initialize({
-                                client_id: GOOGLE_CLIENT_ID,
-                                callback: handleCredentialResponse,
-                                auto_select: false,
-                                cancel_on_tap_outside: true
-                            });
-                            
-                            google.accounts.id.renderButton(
-                                document.querySelector('.g_id_signin'),
-                                { 
-                                    type: 'standard',
-                                    size: 'large',
-                                    theme: 'outline',
-                                    text: 'signin_with',
-                                    shape: 'rectangular',
-                                    logo_alignment: 'left',
-                                    width: 300,
-                                    locale: 'ar'
-                                }
-                            );
-                            console.log('تم تهيئة Google Sign-In بنجاح');
-                        } catch (error) {
-                            console.error('خطأ في تهيئة Google Sign-In:', error);
-                        }
-                    } else {
-                        // Retry after 100ms if Google library not loaded yet
-                        setTimeout(checkGoogleLoaded, 100);
-                    }
-                };
-                
-                // Start checking after a small delay to ensure DOM is ready
-                setTimeout(checkGoogleLoaded, 500);
-            } else {
-                console.warn('Google Client ID لم يتم تكوينه بشكل صحيح');
-                // إخفاء زر Google إذا لم يتم تكوين Client ID
-                const googleButton = document.querySelector('.g_id_signin');
-                if (googleButton) {
-                    googleButton.style.display = 'none';
-                }
-                const orDivider = document.querySelector('.relative.w-full.text-center.my-4');
-                if (orDivider) {
-                    orDivider.style.display = 'none';
-                }
-            }
-        }
-
-        // Function to update the balance on the page
-        function updateBalanceUI(newBalance) {
-            currentBalance = newBalance;
-            balanceElement.textContent = `$${currentBalance.toFixed(2)}`;
-            balancePopup.textContent = `$${currentBalance.toFixed(2)}`;
-            balanceElement.classList.add('scale-110');
-            setTimeout(() => {
-                balanceElement.classList.remove('scale-110');
-                balanceElement.classList.add('scale-100');
-            }, 300);
-        }
-
-        // Function to handle the end of an ad
-        async function endAd(reward) {
-            isAdPlaying = false;
-            if (adTimer) {
-                clearTimeout(adTimer);
-            }
-            
-            watchButton.disabled = true;
-            skipButton.disabled = true;
-
-            if (userId) {
-                if (reward > 0) {
-                    const newBalance = currentBalance + reward;
-                    try {
-                        const userDocRef = doc(db, `/artifacts/${appId}/users/${userId}/balance/current`);
-                        await setDoc(userDocRef, { value: newBalance });
-                        statusMessageElement.textContent = `تمت العملية بنجاح! تم إضافة $${reward.toFixed(2)} إلى رصيدك.`;
-                        statusMessageElement.className = 'mt-4 text-sm text-green-600 h-5 success-animation';
-                    } catch (error) {
-                        console.error("Error updating balance in Firestore: ", error);
-                        statusMessageElement.textContent = `حدث خطأ في حفظ رصيدك.`;
-                        statusMessageElement.className = 'mt-4 text-sm text-red-600 h-5 error-shake';
-                    }
-                } else {
-                    statusMessageElement.textContent = 'تم تخطي الإعلان بنجاح. لم يتم كسب أي نقود.';
-                    statusMessageElement.className = 'mt-4 text-sm text-gray-600 h-5';
-                }
-            } else {
-                statusMessageElement.textContent = 'يجب تسجيل الدخول لحفظ أرباحك.';
-                statusMessageElement.className = 'mt-4 text-sm text-red-600 h-5 error-shake';
-            }
-
-            setTimeout(() => {
-                watchButton.disabled = false;
-                skipButton.disabled = false;
-                watchButton.textContent = 'شاهد إعلان ($0.01)';
-                adImageElement.src = "https://placehold.co/400x200/e5e7eb/6b7280?text=جاري+التحميل...";
-                statusMessageElement.className = 'mt-4 text-sm text-gray-600 h-5';
-            }, 2000);
-        }
-
-        // Event Listeners
-
-        // Watch ad button
-        watchButton.addEventListener('click', () => {
-            if (isAdPlaying) return;
-            isAdPlaying = true;
-            
-            watchButton.disabled = true;
-            skipButton.disabled = true;
-            watchButton.textContent = 'جاري المشاهدة...';
-            statusMessageElement.textContent = 'يرجى الانتظار حتى ينتهي الإعلان.';
-            statusMessageElement.className = 'mt-4 text-sm text-blue-600 h-5';
-
-            adImageElement.src = adImages[currentAdIndex];
-            currentAdIndex = (currentAdIndex + 1) % adImages.length;
-            
-            adTimer = setTimeout(() => {
-                endAd(watchReward);
-            }, adDuration);
+        authModalCloseBtn.addEventListener('click', () => {
+            authModal.style.display = 'none';
         });
 
-        // Skip ad button
-        skipButton.addEventListener('click', () => {
-            endAd(0);
-        });
-
-        // Wallet popup
-        walletButton.addEventListener('click', () => {
-            walletPopup.classList.remove('hidden');
-        });
-
-        closeWalletPopup.addEventListener('click', () => {
-            walletPopup.classList.add('hidden');
-        });
-
-        // Logout button
-        logoutButton.addEventListener('click', async () => {
-            try {
-                await signOut(auth);
-                showMessage(authStatusMessageElement, 'تم تسجيل الخروج بنجاح!');
-            } catch (error) {
-                console.error('Logout error:', error);
-                showMessage(authStatusMessageElement, 'خطأ في تسجيل الخروج. يرجى المحاولة مرة أخرى.', true);
-            }
-        });
-
-        // Signup button
-        signupButton.addEventListener('click', () => {
-            signupPopup.classList.remove('hidden');
-            
-            // إعادة تعيين النافذة للحالة الأولى
-            resetSignupForm();
-        });
-
-        // Close signup popup
-        closeSignupPopup.addEventListener('click', () => {
-            signupPopup.classList.add('hidden');
-            resetSignupForm();
-        });
-
-        // دالة لإعادة تعيين نموذج التسجيل
-        function resetSignupForm() {
-            // Clear all inputs
-            nameSignupInput.value = '';
-            emailSignupInput.value = '';
-            passwordSignupInput.value = '';
-            confirmPasswordInput.value = '';
-            termsCheckbox.checked = false;
-            signupStatusMessageElement.textContent = '';
-
-            // إظهار جميع الحقول
-            nameSignupInput.style.display = 'block';
-            emailSignupInput.style.display = 'block';
-            passwordSignupInput.style.display = 'block';
-            confirmPasswordInput.style.display = 'block';
-
-            // إعادة تعيين الزر
-            confirmSignupButton.textContent = 'إنشاء حساب';
-            confirmSignupButton.className = 'w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-green-300 focus:ring-opacity-50 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed';
-
-            // إظهار زر Google والفاصل
-            const googleSignupButton = document.querySelector('.g_id_signin_signup');
-            const orDivider = document.querySelectorAll('.relative.w-full.text-center.my-4')[1];
-            if (googleSignupButton) {
-                googleSignupButton.style.display = 'block';
-            }
-            if (orDivider) {
-                orDivider.style.display = 'block';
-            }
-
-            // إزالة معلومات Google إن وجدت
-            const googleInfoDiv = document.getElementById('google-info');
-            if (googleInfoDiv) {
-                googleInfoDiv.remove();
-            }
-
-            // تنظيف البيانات
-            if (window.googleUserData) {
-                delete window.googleUserData;
-            }
-
-            // Re-initialize Google button for signup popup
-            setTimeout(() => {
-                if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== 'YOUR_GOOGLE_CLIENT_ID_HERE' && window.google && window.google.accounts) {
-                    try {
-                        google.accounts.id.renderButton(
-                            document.querySelector('.g_id_signin_signup'),
-                            { 
-                                type: 'standard',
-                                size: 'large',
-                                theme: 'outline',
-                                text: 'signup_with',
-                                shape: 'rectangular',
-                                logo_alignment: 'left',
-                                width: 300,
-                                locale: 'ar'
-                            }
-                        );
-                    } catch (error) {
-                        console.error('خطأ في تهيئة زر Google للتسجيل:', error);
-                    }
-                }
-            }, 100);
-        }
-
-        // Confirm signup
-        confirmSignupButton.addEventListener('click', async () => {
-            const name = nameSignupInput.value.trim();
-            const email = emailSignupInput.value.trim();
-            const password = passwordSignupInput.value;
-            const confirmPassword = confirmPasswordInput.value;
-            
-            // Validation
-            if (!name || !email || !password || !confirmPassword) {
-                showMessage(signupStatusMessageElement, 'يرجى ملء جميع الحقول.', true);
-                return;
-            }
-
-            if (!validateName(name)) {
-                showMessage(signupStatusMessageElement, 'يجب أن يكون الاسم حرفين على الأقل.', true);
-                return;
-            }
-
-            if (!validateEmail(email)) {
-                showMessage(signupStatusMessageElement, 'يرجى إدخال بريد إلكتروني صحيح.', true);
-                return;
-            }
-
-            if (!validatePassword(password)) {
-                showMessage(signupStatusMessageElement, 'كلمة المرور يجب أن تكون 6 أحرف على الأقل.', true);
-                return;
-            }
-
-            if (password !== confirmPassword) {
-                showMessage(signupStatusMessageElement, 'كلمات المرور غير متطابقة.', true);
-                return;
-            }
-
-            if (!termsCheckbox.checked) {
-                showMessage(signupStatusMessageElement, 'يجب الموافقة على الشروط والأحكام.', true);
-                return;
-            }
-
-            showLoadingState(false);
-
-            try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-
-                // Update user profile with the provided name
-                await updateProfile(user, { displayName: name });
-                
-                // Save user info to Firestore
-                const userDocRef = doc(db, `/artifacts/${appId}/users/${user.uid}/profile/info`);
-                await setDoc(userDocRef, { name: name, email: email });
-
-                showMessage(signupStatusMessageElement, 'تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول.');
-                setTimeout(() => {
-                    signupPopup.classList.add('hidden');
-                    authStatusMessageElement.textContent = '';
-                }, 2000);
-            } catch (error) {
-                console.error("Signup failed:", error);
-                let errorMessage = 'خطأ في إنشاء الحساب. يرجى المحاولة لاحقاً.';
-                if (error.code === 'auth/email-already-in-use') {
-                    errorMessage = 'هذا البريد الإلكتروني مستخدم بالفعل.';
-                } else if (error.code === 'auth/invalid-email') {
-                    errorMessage = 'صيغة البريد الإلكتروني غير صحيحة.';
-                } else if (error.code === 'auth/weak-password') {
-                    errorMessage = 'كلمة المرور ضعيفة جداً، يجب أن تكون 6 أحرف على الأقل.';
-                } else if (error.code === 'auth/operation-not-allowed') {
-                    errorMessage = 'عملية التسجيل عبر البريد الإلكتروني غير متاحة في الوقت الحالي.';
-                }
-                showMessage(signupStatusMessageElement, errorMessage, true);
-            } finally {
-                hideLoadingState(false);
-            }
-        });
-
-        // Email/Password sign-in
-        emailSignInButton.addEventListener('click', async () => {
-            const email = emailInput.value.trim();
-            const password = passwordInput.value;
-
+        // Handles email/password authentication (sign in or sign up)
+        async function handleEmailAuth(authFunction) {
+            const email = authEmail.value;
+            const password = authPassword.value;
             if (!email || !password) {
-                showMessage(authStatusMessageElement, 'يرجى إدخال البريد الإلكتروني وكلمة المرور.', true);
+                showMessage('الرجاء إدخال البريد الإلكتروني وكلمة المرور.');
                 return;
             }
-
-            if (!validateEmail(email)) {
-                showMessage(authStatusMessageElement, 'يرجى إدخال بريد إلكتروني صحيح.', true);
-                return;
-            }
-
-            showLoadingState(true);
-
             try {
-                await signInWithEmailAndPassword(auth, email, password);
-                showMessage(authStatusMessageElement, 'تم تسجيل الدخول بنجاح!');
+                await authFunction(auth, email, password);
+                authModal.style.display = 'none';
+                showMessage('تمت المصادقة بنجاح.');
             } catch (error) {
-                console.error("Email/Password sign-in failed:", error);
-                let errorMessage = 'خطأ في تسجيل الدخول. يرجى التحقق من البيانات.';
-                if (error.code === 'auth/user-not-found') {
-                    errorMessage = 'لم يتم العثور على هذا الحساب. يرجى إنشاء حساب جديد.';
-                } else if (error.code === 'auth/wrong-password') {
-                    errorMessage = 'كلمة المرور غير صحيحة.';
-                } else if (error.code === 'auth/invalid-email') {
-                    errorMessage = 'صيغة البريد الإلكتروني غير صحيحة.';
-                } else if (error.code === 'auth/user-disabled') {
-                    errorMessage = 'تم تعطيل هذا الحساب.';
-                } else if (error.code === 'auth/operation-not-allowed') {
-                    errorMessage = 'عملية تسجيل الدخول عبر البريد الإلكتروني غير متاحة في الوقت الحالي.';
+                console.error("Authentication Error:", error);
+                let message = 'حدث خطأ في المصادقة.';
+                if (error.code === 'auth/email-already-in-use') {
+                    message = 'هذا البريد الإلكتروني مستخدم بالفعل.';
+                } else if (error.code === 'auth/invalid-credential') {
+                    message = 'البيانات غير صحيحة. يرجى التحقق من البريد وكلمة المرور.';
+                } else if (error.code === 'auth/weak-password') {
+                    message = 'كلمة المرور ضعيفة جدًا.';
                 }
-                showMessage(authStatusMessageElement, errorMessage, true);
-            } finally {
-                hideLoadingState(true);
+                showMessage(message);
             }
-        });
+        }
 
-        // Initialize Firebase and set up listener
-        window.onload = async function() {
+        // --- Firebase Functions ---
+
+        // Initializes Firebase and sets up authentication
+        async function initializeFirebase() {
             try {
-                const app = initializeApp(firebaseConfig);
+                // Initialize the app with the provided config
+                app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
 
-                // Initialize Google Sign-In
-                initializeGoogleSignIn();
-
-                // Sign in with the custom token provided by the environment
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                }
-
-                // Set up a listener for authentication state changes
+                // Listen for authentication state changes
                 onAuthStateChanged(auth, async (user) => {
+                    isAuthReady = true;
                     if (user) {
-                        // User is signed in
                         userId = user.uid;
-                        userEmail = user.email;
-                        userName = user.displayName || 'مستخدم';
-                        
-                        userIdPopup.textContent = userId;
-                        userEmailPopup.textContent = userEmail || 'غير محدد';
-                        welcomeMessage.textContent = `مرحباً ${userName}!`;
-                        
-                        loginScreen.classList.add('hidden');
-                        mainApp.classList.remove('hidden');
-                        
-                        // Set up a real-time listener for the user's balance
-                        const userBalanceDocRef = doc(db, `/artifacts/${appId}/users/${userId}/balance/current`);
-                        onSnapshot(userBalanceDocRef, (docSnap) => {
-                            if (docSnap.exists()) {
-                                const data = docSnap.data();
-                                updateBalanceUI(data.value);
-                            } else {
-                                // If the balance document doesn't exist, create it with a starting balance of 0
-                                setDoc(userBalanceDocRef, { value: 0 });
+                        // Determine display name based on auth provider
+                        let displayName = 'مستخدم مجهول';
+                        if (user.providerData && user.providerData.length > 0) {
+                            const providerId = user.providerData[0].providerId;
+                            if (providerId === 'google.com') {
+                                displayName = user.displayName || 'مستخدم غوغل';
+                            } else if (user.email) {
+                                displayName = user.email;
                             }
-                        });
-
-                        // Set up a real-time listener for the user's profile
-                        const userProfileDocRef = doc(db, `/artifacts/${appId}/users/${userId}/profile/info`);
-                        onSnapshot(userProfileDocRef, (docSnap) => {
-                            if (docSnap.exists()) {
-                                const data = docSnap.data();
-                                if (data.name) {
-                                    userName = data.name;
-                                    welcomeMessage.textContent = `مرحباً ${userName}!`;
-                                }
-                            }
-                        });
+                        }
                         
+                        authStatus.textContent = `مرحباً، ${displayName}!`;
+                        userIdDisplay.textContent = userId;
+                        signOutBtn.classList.remove('hidden');
+                        walletBtn.classList.remove('hidden');
+                        emailSignInBtn.classList.add('hidden');
+                        emailSignUpBtn.classList.add('hidden');
+                        googleSignInBtn.classList.add('hidden');
+                        setupRealtimeListener();
                     } else {
-                        // User is signed out
-                        console.log("User is not authenticated. Showing login screen.");
                         userId = null;
-                        userEmail = null;
-                        userName = null;
-                        userIdPopup.textContent = 'غير متصل';
-                        userEmailPopup.textContent = 'غير متصل';
-                        welcomeMessage.textContent = 'مرحباً بك!';
-                        loginScreen.classList.remove('hidden');
-                        mainApp.classList.add('hidden');
-                        updateBalanceUI(0);
+                        authStatus.textContent = 'غير متصل';
+                        userIdDisplay.textContent = '...';
+                        balanceDisplay.textContent = '0.00';
+                        userBalanceSpan.textContent = '0.00 دينار';
+                        signOutBtn.classList.add('hidden');
+                        walletBtn.classList.add('hidden');
+                        emailSignInBtn.classList.remove('hidden');
+                        emailSignUpBtn.classList.remove('hidden');
+                        googleSignInBtn.classList.remove('hidden');
                     }
                 });
+
+                // Sign in with the custom token if it exists
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    // Fallback to anonymous sign-in if no custom token is available
+                    await signInAnonymously(auth);
+                }
             } catch (error) {
-                console.error("Firebase initialization or authentication failed:", error);
-                showMessage(authStatusMessageElement, `فشل الاتصال بالخدمة. يرجى المحاولة لاحقاً.`, true);
+                console.error("Error initializing Firebase:", error);
+                // Even with an error, the app should continue to display,
+                // but with limited functionality.
             }
+        }
+
+        // Sets up a real-time listener for the user's balance
+        function setupRealtimeListener() {
+            if (!userId || !db || !isAuthReady) {
+                console.error("Firebase or user not ready for listener.");
+                return;
+            }
+
+            const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/user_data/balance`);
+
+            onSnapshot(userDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    const balance = data.amount || 0;
+                    balanceDisplay.textContent = balance.toFixed(2);
+                    userBalanceSpan.textContent = `${balance.toFixed(2)} دينار`;
+                } else {
+                    // Create the document if it doesn't exist
+                    setDoc(userDocRef, { amount: 0, lastUpdated: new Date() }).catch(e => console.error("Error creating document:", e));
+                }
+            }, (error) => {
+                console.error("Error listening to balance:", error);
+            });
+        }
+
+        // Updates the user's balance in Firestore
+        async function updateBalance(amount) {
+            if (!userId || !db) {
+                showMessage('خطأ: المستخدم غير مسجل الدخول.');
+                return;
+            }
+
+            const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/user_data/balance`);
+
+            try {
+                // Get the current balance
+                const docSnap = await getDoc(userDocRef);
+                let currentBalance = 0;
+                if (docSnap.exists()) {
+                    currentBalance = docSnap.data().amount || 0;
+                }
+
+                // Calculate the new balance and update the document
+                const newBalance = currentBalance + amount;
+                await setDoc(userDocRef, { amount: newBalance, lastUpdated: new Date() });
+
+                showMessage(`تهانينا! لقد ربحت ${amount.toFixed(2)} دينار. رصيدك الجديد هو ${newBalance.toFixed(2)} دينار.`);
+            } catch (e) {
+                console.error("Error updating balance:", e);
+                showMessage('حدث خطأ أثناء تحديث رصيدك. يرجى المحاولة مرة أخرى.');
+            }
+        }
+
+        // --- UI Rendering and Event Listeners ---
+
+        // Renders the ad cards on the page
+        function renderAds() {
+            adsContainer.innerHTML = '';
+            ads.forEach(ad => {
+                const adCard = document.createElement('div');
+                adCard.className = "ad-card bg-white rounded-xl overflow-hidden";
+                adCard.innerHTML = `
+                    <img src="${ad.imageUrl}" alt="${ad.title}" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">${ad.title}</h3>
+                        <p class="text-gray-600 text-sm mb-4">${ad.description}</p>
+                        <button class="watch-ad-btn bg-green-500 text-white px-4 py-2 rounded-full font-semibold w-full hover:bg-green-600 transition duration-300" data-reward="${ad.reward}">
+                            شاهد واكسب ${ad.reward.toFixed(2)} دينار
+                        </button>
+                    </div>
+                `;
+                adsContainer.appendChild(adCard);
+            });
+
+            // Attach event listeners to the new buttons
+            document.querySelectorAll('.watch-ad-btn').forEach(button => {
+                button.addEventListener('click', async (event) => {
+                    if (!userId) {
+                        showMessage('يجب تسجيل الدخول أولاً للمتابعة.');
+                        return;
+                    }
+
+                    const reward = parseFloat(event.target.dataset.reward);
+                    await updateBalance(reward);
+                });
+            });
+        }
+
+        // Sidebar show/hide logic
+        menuBtn.addEventListener('click', () => {
+            sidebar.classList.add('open');
+        });
+
+        closeBtn.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+        });
+
+        // Auth button event listeners
+        emailSignInBtn.addEventListener('click', () => {
+            showAuthModal('signIn');
+        });
+
+        emailSignUpBtn.addEventListener('click', () => {
+            showAuthModal('signUp');
+        });
+        
+        googleSignInBtn.addEventListener('click', async () => {
+            const provider = new GoogleAuthProvider();
+            try {
+                await signInWithPopup(auth, provider);
+                showMessage('تم تسجيل الدخول بنجاح باستخدام غوغل.');
+            } catch (error) {
+                console.error("Google Sign-in error:", error);
+                let message = 'حدث خطأ في المصادقة عبر غوغل.';
+                if (error.code === 'auth/popup-closed-by-user') {
+                    message = 'تم إغلاق نافذة المصادقة. يرجى المحاولة مرة أخرى.';
+                } else if (error.code === 'auth/cancelled-by-user') {
+                    message = 'تم إلغاء عملية المصادقة.';
+                }
+                showMessage(message);
+            }
+        });
+
+        // Wallet button logic (simulated withdrawal)
+        walletBtn.addEventListener('click', async () => {
+            if (!userId) {
+                showMessage('يجب تسجيل الدخول أولاً للوصول إلى المحفظة.');
+                return;
+            }
+
+            const currentBalance = parseFloat(balanceDisplay.textContent);
+            if (currentBalance >= 100) {
+                // This is a simplified, simulated withdrawal process.
+                // In a real application, this would involve external payment APIs.
+                const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/user_data/balance`);
+                await setDoc(userDocRef, { amount: currentBalance - 100, lastUpdated: new Date() });
+                showMessage(`تمت محاكاة سحب 100 دينار بنجاح. رصيدك المتبقي هو ${ (currentBalance - 100).toFixed(2) } دينار.`);
+            } else {
+                showMessage(`رصيدك الحالي هو ${currentBalance.toFixed(2)} دينار. يجب أن يبلغ رصيدك 100 دينار على الأقل لإجراء عملية السحب.`);
+            }
+        });
+
+        // Sign out logic
+        signOutBtn.addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                showMessage('تم تسجيل خروجك بنجاح.');
+            } catch (error) {
+                console.error("Sign out error:", error);
+                showMessage('فشل تسجيل الخروج.');
+            }
+        });
+
+        // --- Initial app load ---
+        window.onload = () => {
+            initializeFirebase();
+            renderAds();
         };
     </script>
 </body>

@@ -15,46 +15,111 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         .ad-card {
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
-            transition: transform 0.2s ease-in-out;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
         }
         .ad-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
         }
         #sidebar {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
             transition: transform 0.3s ease-in-out;
             transform: translateX(100%);
         }
         #sidebar.open {
             transform: translateX(0);
         }
-        /* Style for modals to ensure they are centered and visible */
         .modal-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 999;
+            animation: fadeIn 0.3s ease;
+        }
+        .modal-content {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-50px) scale(0.9); }
+            to { transform: translateY(0) scale(1); }
+        }
+        .balance-card {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 3px solid #667eea;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .btn-google {
+            background: #db4437;
+            transition: all 0.3s ease;
+        }
+        .btn-google:hover {
+            background: #c23321;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
 <body class="bg-gray-100 flex flex-col min-h-screen">
-    <header class="bg-white shadow-md p-4">
+    <header class="glass-effect p-4 sticky top-0 z-40">
         <nav class="container mx-auto flex justify-between items-center">
-            <h1 class="text-3xl font-bold text-gray-800">موقع الإعلانات</h1>
+            <h1 class="text-3xl font-bold text-white drop-shadow-lg">💰 موقع الإعلانات</h1>
             <div class="flex items-center space-x-4 space-x-reverse">
-                <div class="flex items-center space-x-2 space-x-reverse">
-                    <span id="userBalance" class="text-xl font-semibold text-green-600">0.00 دينار</span>
+                <div class="flex items-center space-x-2 space-x-reverse glass-effect px-4 py-2 rounded-full">
+                    <span id="userBalance" class="text-xl font-semibold text-white">0.00 دينار</span>
+                    <i class="fas fa-coins text-yellow-400"></i>
                 </div>
-                <button id="menuBtn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-full font-semibold hover:bg-gray-300 transition duration-300">
+                <button id="menuBtn" class="glass-effect text-white px-4 py-2 rounded-full font-semibold hover:bg-white hover:bg-opacity-20 transition duration-300">
                     <i class="fas fa-bars"></i>
                 </button>
             </div>
@@ -62,66 +127,105 @@
     </header>
 
     <!-- Side Menu -->
-    <div id="sidebar" class="fixed inset-y-0 right-0 w-64 bg-white shadow-xl z-50 p-6 flex flex-col justify-start items-center space-y-4">
-        <button id="closeBtn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+    <div id="sidebar" class="fixed inset-y-0 right-0 w-80 shadow-xl z-50 p-6 flex flex-col justify-start items-center space-y-4">
+        <button id="closeBtn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition duration-300">
             <i class="fas fa-times text-2xl"></i>
         </button>
-        <div class="w-full text-center py-4 border-b border-gray-200">
+        <div class="w-full text-center py-6 border-b border-gray-200">
+            <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                <i class="fas fa-user text-3xl text-white"></i>
+            </div>
             <h3 class="text-xl font-semibold text-gray-800">حسابي</h3>
             <p id="authStatus" class="text-sm text-gray-500 mt-1">غير متصل</p>
         </div>
-        <!-- Guest sign-in button -->
-        <button id="signInAnonymouslyBtn" class="w-full bg-gray-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-gray-600 transition duration-300">
-            <i class="fas fa-user-circle ml-2"></i> تسجيل الدخول كزائر
-        </button>
-        <button id="emailSignInBtn" class="w-full bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700 transition duration-300">
-            <i class="fas fa-envelope ml-2"></i> تسجيل الدخول بالبريد
-        </button>
-        <button id="emailSignUpBtn" class="w-full bg-green-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-green-700 transition duration-300">
-            <i class="fas fa-user-plus ml-2"></i> إنشاء حساب بالبريد
-        </button>
-        <!-- Google Sign-in Button -->
-        <button id="googleSignInBtn" class="w-full bg-red-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-red-600 transition duration-300 flex items-center justify-center space-x-2 space-x-reverse">
-            <i class="fab fa-google ml-2"></i> تسجيل الدخول عبر غوغل
-        </button>
-        <button id="walletBtn" class="w-full bg-purple-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-purple-700 transition duration-300 hidden">
-            <i class="fas fa-wallet ml-2"></i> محفظتي
-        </button>
-        <button id="signOutBtn" class="w-full bg-red-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-red-600 transition duration-300 hidden">
-            <i class="fas fa-sign-out-alt ml-2"></i> تسجيل الخروج
-        </button>
+        
+        <!-- Auth buttons - will be shown/hidden based on login status -->
+        <div id="authButtons" class="w-full space-y-4">
+            <!-- Guest sign-in button -->
+            <button id="signInAnonymouslyBtn" class="w-full btn-primary text-white px-6 py-3 rounded-full font-semibold transition duration-300 flex items-center justify-center">
+                <i class="fas fa-user-circle ml-2"></i> 
+                <span>تسجيل الدخول كزائر</span>
+                <div id="anonLoader" class="loading-spinner ml-2 hidden"></div>
+            </button>
+            
+            <button id="emailSignInBtn" class="w-full bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700 transition duration-300 flex items-center justify-center">
+                <i class="fas fa-envelope ml-2"></i> تسجيل الدخول بالبريد
+            </button>
+            
+            <button id="emailSignUpBtn" class="w-full bg-green-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-green-700 transition duration-300 flex items-center justify-center">
+                <i class="fas fa-user-plus ml-2"></i> إنشاء حساب بالبريد
+            </button>
+            
+            <!-- Google Sign-in Button -->
+            <button id="googleSignInBtn" class="w-full btn-google text-white px-6 py-3 rounded-full font-semibold transition duration-300 flex items-center justify-center space-x-2 space-x-reverse">
+                <i class="fab fa-google ml-2"></i> 
+                <span>تسجيل الدخول عبر غوغل</span>
+                <div id="googleLoader" class="loading-spinner ml-2 hidden"></div>
+            </button>
+        </div>
+        
+        <!-- Logged-in user buttons - will be hidden initially -->
+        <div id="loggedInButtons" class="w-full space-y-4 hidden">
+            <button id="walletBtn" class="w-full bg-purple-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-purple-700 transition duration-300 flex items-center justify-center">
+                <i class="fas fa-wallet ml-2"></i> محفظتي
+            </button>
+            
+            <button id="signOutBtn" class="w-full bg-red-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-red-600 transition duration-300 flex items-center justify-center">
+                <i class="fas fa-sign-out-alt ml-2"></i> تسجيل الخروج
+            </button>
+        </div>
     </div>
 
     <main class="container mx-auto my-8 p-4 flex-grow">
-        <div class="bg-white p-6 rounded-xl shadow-lg mb-6">
-            <h2 class="text-2xl font-bold text-gray-700 mb-2">رصيدك الحالي</h2>
-            <p class="text-4xl font-extrabold text-blue-600"><span id="balanceDisplay">0.00</span> دينار</p>
+        <div class="balance-card text-white p-8 rounded-2xl shadow-2xl mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold mb-2">💎 رصيدك الحالي</h2>
+                    <p class="text-4xl font-extrabold"><span id="balanceDisplay">0.00</span> دينار</p>
+                </div>
+                <div class="text-6xl opacity-20">
+                    <i class="fas fa-coins"></i>
+                </div>
+            </div>
         </div>
 
-        <h2 class="text-2xl font-bold text-gray-700 mb-4">شاهد الإعلانات واكسب</h2>
-        <div id="adsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-3xl font-bold text-white drop-shadow-lg">🎯 شاهد الإعلانات واكسب</h2>
+            <div id="adCounter" class="glass-effect px-4 py-2 rounded-full text-white font-semibold">
+                <i class="fas fa-eye ml-2"></i>
+                <span id="watchedCount">0</span> / <span id="totalAds">0</span> مشاهدة
+            </div>
+        </div>
+        
+        <div id="adsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <!-- Ad cards will be inserted here by JavaScript -->
         </div>
     </main>
 
+    <!-- Overlay for sidebar -->
+    <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-30" onclick="closeSidebar()"></div>
+
     <!-- Modal for messages -->
     <div id="modal" class="modal-container">
-        <div class="bg-white p-8 rounded-lg shadow-xl text-center">
-            <p id="modalMessage" class="text-lg font-semibold mb-4"></p>
-            <button id="modalCloseButton" class="bg-blue-600 text-white px-4 py-2 rounded-lg">إغلاق</button>
+        <div class="modal-content p-8 rounded-2xl shadow-2xl text-center max-w-md mx-4">
+            <div id="modalIcon" class="text-6xl mb-4">🎉</div>
+            <p id="modalMessage" class="text-lg font-semibold mb-6 text-gray-800"></p>
+            <button id="modalCloseButton" class="btn-primary text-white px-6 py-3 rounded-full font-semibold">إغلاق</button>
         </div>
     </div>
 
     <!-- Modal for Email/Password forms -->
     <div id="authModal" class="modal-container">
-        <div class="bg-white p-8 rounded-lg shadow-xl text-center w-80">
-            <h3 id="authModalTitle" class="text-2xl font-bold mb-4"></h3>
-            <input type="email" id="authEmail" placeholder="البريد الإلكتروني" class="w-full p-3 mb-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <input type="password" id="authPassword" placeholder="كلمة المرور" class="w-full p-3 mb-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <button id="authSubmitBtn" class="w-full bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700 transition duration-300">
-                تأكيد
+        <div class="modal-content p-8 rounded-2xl shadow-2xl text-center w-96 mx-4">
+            <h3 id="authModalTitle" class="text-2xl font-bold mb-6 text-gray-800"></h3>
+            <div id="authError" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"></div>
+            <input type="email" id="authEmail" placeholder="البريد الإلكتروني" class="w-full p-4 mb-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-right">
+            <input type="password" id="authPassword" placeholder="كلمة المرور" class="w-full p-4 mb-6 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-right">
+            <button id="authSubmitBtn" class="w-full btn-primary text-white px-6 py-3 rounded-full font-semibold mb-4 flex items-center justify-center">
+                <span>تأكيد</span>
+                <div id="authLoader" class="loading-spinner ml-2 hidden"></div>
             </button>
-            <button id="authModalCloseBtn" class="w-full mt-4 text-gray-600 hover:text-gray-800">
+            <button id="authModalCloseBtn" class="w-full text-gray-600 hover:text-gray-800 transition duration-300">
                 إلغاء
             </button>
         </div>
@@ -129,58 +233,59 @@
 
     <!-- Firebase CDN -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-        /**
-         * ملاحظة مهمة جداً حول الأخطاء:
-         * الخطأ "Missing or insufficient permissions" الذي يظهر في وحدة التحكم (Console) ليس خطأ في الشيفرة البرمجية.
-         * إنه يعني أن قواعد الأمان (Firebase Security Rules) الخاصة بقاعدة بيانات Firestore لا تسمح بالوصول إلى البيانات.
-         *
-         * لتصحيح هذا الخطأ:
-         * 1. اذهب إلى لوحة تحكم مشروعك في Firebase.
-         * 2. اختر "Firestore Database" من القائمة الجانبية.
-         * 3. انتقل إلى علامة التبويب "Rules" (القواعد).
-         * 4. قم بلصق القواعد التالية في المحرر، ثم اضغط على "Publish" (نشر).
-         *
-         * ```
-         * rules_version = '2';
-         * service cloud.firestore {
-         * match /databases/{database}/documents {
-         * // هذه القاعدة تسمح للمستخدم المصادق عليه (بما في ذلك المستخدم المجهول)
-         * // بقراءة وكتابة البيانات في مساره الخاص فقط.
-         * match /artifacts/{appId}/users/{userId}/{document=**} {
-         * allow read, write: if request.auth != null && request.auth.uid == userId;
-         * }
-         * }
-         * }
-         * ```
-         * بعد تطبيق هذه القواعد، سيعمل التطبيق بشكل صحيح بعد تسجيل الدخول.
-         */
-        
         // Enable debug logging for Firebase Firestore
         setLogLevel('debug');
 
-        // Global variables provided by the Canvas environment
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        let firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        // Global variables with fallbacks for Canvas environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'demo-ads-app';
+        let firebaseConfig = {};
+        
+        try {
+            firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        } catch (e) {
+            console.log("Using demo Firebase config");
+        }
+        
+        // Demo configuration fallback to a working setup for public domains
+        if (!firebaseConfig.apiKey) {
+            firebaseConfig = {
+                apiKey: "AIzaSyBvOKTyDlMuFMhFjoMUxe1HI_DECb-J6-I",
+                authDomain: "ads-earnings-site.firebaseapp.com",
+                projectId: "ads-earnings-site",
+                storageBucket: "ads-earnings-site.appspot.com",
+                messagingSenderId: "640635892482",
+                appId: "1:640635892482:web:abc123def456ghi789"
+            };
+        }
 
-        // Add the provided Google Client ID to the Firebase config
-        const googleClientId = "640635892482-ldefv7a2slqgrq09of42qpme20eumkq9.apps.googleusercontent.com";
-        firebaseConfig.authDomain = "YOUR_AUTH_DOMAIN"; // Replace with your actual auth domain if needed
-        firebaseConfig.clientId = googleClientId;
-        firebaseConfig.apiKey = "YOUR_API_KEY"; // Placeholder for API key if not in config
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        // Configure Google Auth Provider
+        const googleProvider = new GoogleAuthProvider();
+        googleProvider.setCustomParameters({
+            prompt: 'select_account'
+        });
 
-        let app;
-        let auth;
-        let db;
+        let watchedAds = new Set();
+        
 
         // Get UI elements
         const menuBtn = document.getElementById('menuBtn');
         const sidebar = document.getElementById('sidebar');
         const closeBtn = document.getElementById('closeBtn');
+        const overlay = document.getElementById('overlay');
+        
+        // Auth buttons
+        const authButtons = document.getElementById('authButtons');
+        const loggedInButtons = document.getElementById('loggedInButtons');
         const signInAnonymouslyBtn = document.getElementById('signInAnonymouslyBtn');
         const emailSignInBtn = document.getElementById('emailSignInBtn');
         const emailSignUpBtn = document.getElementById('emailSignUpBtn');
@@ -192,9 +297,12 @@
         const balanceDisplay = document.getElementById('balanceDisplay');
         const userBalanceSpan = document.getElementById('userBalance');
         const adsContainer = document.getElementById('adsContainer');
+        const watchedCount = document.getElementById('watchedCount');
+        const totalAds = document.getElementById('totalAds');
 
         const modal = document.getElementById('modal');
         const modalMessage = document.getElementById('modalMessage');
+        const modalIcon = document.getElementById('modalIcon');
         const modalCloseButton = document.getElementById('modalCloseButton');
 
         const authModal = document.getElementById('authModal');
@@ -203,117 +311,282 @@
         const authPassword = document.getElementById('authPassword');
         const authSubmitBtn = document.getElementById('authSubmitBtn');
         const authModalCloseBtn = document.getElementById('authModalCloseBtn');
+        const authError = document.getElementById('authError');
 
-        // Dummy ads data
+        // Loading spinners
+        const anonLoader = document.getElementById('anonLoader');
+        const googleLoader = document.getElementById('googleLoader');
+        const authLoader = document.getElementById('authLoader');
+
+        // Enhanced ads data with more variety
         const ads = [
-            { id: 1, title: 'إعلان لسيارة فاخرة', imageUrl: 'https://placehold.co/400x250/333333/ffffff?text=Car+Ad', reward: 0.50, description: 'شاهد إعلانًا لسيارة جديدة واكسب 0.50 دينار.' },
-            { id: 2, title: 'تطبيق جديد', imageUrl: 'https://placehold.co/400x250/1d4ed8/ffffff?text=App+Ad', reward: 0.25, description: 'اكسب 0.25 دينار بمشاهدة إعلان عن تطبيق جديد.' },
-            { id: 3, title: 'أحذية رياضية', imageUrl: 'https://placehold.co/400x250/22c55e/ffffff?text=Shoes+Ad', reward: 0.75, description: 'شاهد إعلانًا عن أحدث الأحذية الرياضية واكسب 0.75 دينار.' },
-            { id: 4, title: 'مأكولات ومشروبات', imageUrl: 'https://placehold.co/400x250/f97316/ffffff?text=Food+%26+Drinks', reward: 0.40, description: 'احصل على 0.40 دينار لمشاهدة هذا الإعلان.' },
+            { 
+                id: 1, 
+                title: 'سيارة BMW الجديدة 2024', 
+                imageUrl: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400&h=250&fit=crop',
+                reward: 0.50, 
+                description: 'اكتشف أحدث موديلات BMW واكسب 0.50 دينار.',
+                category: 'سيارات'
+            },
+            { 
+                id: 2, 
+                title: 'تطبيق التوصيل السريع', 
+                imageUrl: 'https://images.unsplash.com/photo-1512428813834-c702c7702b78?w=400&h=250&fit=crop',
+                reward: 0.25, 
+                description: 'جرب تطبيق التوصيل الأسرع واكسب 0.25 دينار.',
+                category: 'تطبيقات'
+            },
+            { 
+                id: 3, 
+                title: 'أحذية نايكي الرياضية', 
+                imageUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=250&fit=crop',
+                reward: 0.75, 
+                description: 'اكتشف مجموعة أحذية نايكي الجديدة واكسب 0.75 دينار.',
+                category: 'رياضة'
+            },
+            { 
+                id: 4, 
+                title: 'مطعم البرجر الفاخر', 
+                imageUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=250&fit=crop',
+                reward: 0.40, 
+                description: 'تذوق أشهى البرجر واكسب 0.40 دينار.',
+                category: 'طعام'
+            },
+            { 
+                id: 5, 
+                title: 'ساعة ذكية متطورة', 
+                imageUrl: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=250&fit=crop',
+                reward: 0.60, 
+                description: 'اكتشف ميزات الساعة الذكية الجديدة واكسب 0.60 دينار.',
+                category: 'تكنولوجيا'
+            },
+            { 
+                id: 6, 
+                title: 'دورة البرمجة المجانية', 
+                imageUrl: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=250&fit=crop',
+                reward: 0.35, 
+                description: 'تعلم البرمجة مجاناً واكسب 0.35 دينار.',
+                category: 'تعليم'
+            }
         ];
 
         // --- Helper Functions ---
         
-        // Displays a custom modal message
-        function showMessage(message) {
+        function showMessage(message, icon = '🎉', type = 'success') {
             modalMessage.textContent = message;
+            modalIcon.textContent = icon;
+            
+            // Change modal styling based on type
+            const modalContent = modal.querySelector('.modal-content');
+            modalContent.className = 'modal-content p-8 rounded-2xl shadow-2xl text-center max-w-md mx-4';
+            
+            if (type === 'error') {
+                modalContent.classList.add('border-2', 'border-red-500');
+            } else if (type === 'warning') {
+                modalContent.classList.add('border-2', 'border-yellow-500');
+            } else {
+                modalContent.classList.add('border-2', 'border-green-500');
+            }
+            
             modal.style.display = 'flex';
         }
 
-        modalCloseButton.addEventListener('click', () => {
-            modal.style.display = 'none';
-        });
+        function showAuthError(message) {
+            authError.textContent = message;
+            authError.classList.remove('hidden');
+            setTimeout(() => {
+                authError.classList.add('hidden');
+            }, 5000);
+        }
 
-        // Shows the email/password authentication modal
+        function hideAuthError() {
+            authError.classList.add('hidden');
+        }
+
+        function showLoader(element, show = true) {
+            if (show) {
+                element.classList.remove('hidden');
+            } else {
+                element.classList.add('hidden');
+            }
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            overlay.classList.add('hidden');
+        }
+
+        function openSidebar() {
+            sidebar.classList.add('open');
+            overlay.classList.remove('hidden');
+        }
+
         function showAuthModal(type) {
             authEmail.value = '';
             authPassword.value = '';
+            hideAuthError();
+            
             if (type === 'signIn') {
-                authModalTitle.textContent = 'تسجيل الدخول';
-                authSubmitBtn.textContent = 'تسجيل الدخول';
-                authSubmitBtn.onclick = () => handleEmailAuth(signInWithEmailAndPassword);
+                authModalTitle.textContent = '🔐 تسجيل الدخول';
+                authSubmitBtn.innerHTML = '<span>تسجيل الدخول</span><div id="authLoader" class="loading-spinner ml-2 hidden"></div>';
+                authSubmitBtn.onclick = handleSignIn;
             } else {
-                authModalTitle.textContent = 'إنشاء حساب';
-                authSubmitBtn.textContent = 'إنشاء حساب';
-                authSubmitBtn.onclick = () => handleEmailAuth(createUserWithEmailAndPassword);
+                authModalTitle.textContent = '👤 إنشاء حساب جديد';
+                authSubmitBtn.innerHTML = '<span>إنشاء حساب</span><div id="authLoader" class="loading-spinner ml-2 hidden"></div>';
+                authSubmitBtn.onclick = handleSignUp;
             }
             authModal.style.display = 'flex';
         }
 
-        authModalCloseBtn.addEventListener('click', () => {
-            authModal.style.display = 'none';
-        });
-
-        // Handles email/password authentication (sign in or sign up)
-        async function handleEmailAuth(authFunction) {
-            const email = authEmail.value;
+        async function handleSignIn() {
+            const email = authEmail.value.trim();
             const password = authPassword.value;
+            
             if (!email || !password) {
-                showMessage('الرجاء إدخال البريد الإلكتروني وكلمة المرور.');
+                showAuthError('الرجاء إدخال البريد الإلكتروني وكلمة المرور.');
                 return;
             }
+            
+            if (!isValidEmail(email)) {
+                showAuthError('البريد الإلكتروني غير صالح.');
+                return;
+            }
+            
+            const authLoaderInModal = authSubmitBtn.querySelector('.loading-spinner');
+            showLoader(authLoaderInModal, true);
+            authSubmitBtn.disabled = true;
+            hideAuthError();
+            
             try {
-                await authFunction(auth, email, password);
+                await signInWithEmailAndPassword(auth, email, password);
                 authModal.style.display = 'none';
-                showMessage('تمت المصادقة بنجاح.');
+                showMessage('تمت المصادقة بنجاح! مرحباً بك', '✅');
+                closeSidebar();
             } catch (error) {
-                console.error("Authentication Error:", error);
-                let message = 'حدث خطأ في المصادقة.';
-                if (error.code === 'auth/email-already-in-use') {
-                    message = 'هذا البريد الإلكتروني مستخدم بالفعل.';
-                } else if (error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-login-credentials') {
-                    message = 'البيانات غير صحيحة. يرجى التحقق من البريد وكلمة المرور.';
-                } else if (error.code === 'auth/weak-password') {
-                    message = 'كلمة المرور ضعيفة جدًا.';
-                }
-                showMessage(message);
+                console.error("Sign-in Error:", error);
+                handleAuthError(error);
+            } finally {
+                showLoader(authLoaderInModal, false);
+                authSubmitBtn.disabled = false;
             }
         }
 
-        // --- Firebase Functions ---
-
-        // Initializes Firebase and sets up authentication
-        async function initializeFirebase() {
+        async function handleSignUp() {
+            const email = authEmail.value.trim();
+            const password = authPassword.value;
+            
+            if (!email || !password) {
+                showAuthError('الرجاء إدخال البريد الإلكتروني وكلمة المرور.');
+                return;
+            }
+            
+            if (!isValidEmail(email)) {
+                showAuthError('البريد الإلكتروني غير صالح.');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showAuthError('كلمة المرور ضعيفة جداً. يجب أن تحتوي على 6 أحرف على الأقل.');
+                return;
+            }
+            
+            const authLoaderInModal = authSubmitBtn.querySelector('.loading-spinner');
+            showLoader(authLoaderInModal, true);
+            authSubmitBtn.disabled = true;
+            hideAuthError();
+            
             try {
-                // Initialize the app with the provided config
-                app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-
-                // Listen for authentication state changes
-                onAuthStateChanged(auth, async (user) => {
-                    if (user) {
-                        // User is signed in.
-                        const displayName = user.displayName || user.email || 'مستخدم مسجل';
-                        authStatus.textContent = `مرحباً، ${displayName}!`;
-                        signOutBtn.classList.remove('hidden');
-                        walletBtn.classList.remove('hidden');
-                        signInAnonymouslyBtn.classList.add('hidden');
-                        emailSignInBtn.classList.add('hidden');
-                        emailSignUpBtn.classList.add('hidden');
-                        googleSignInBtn.classList.add('hidden');
-                        setupRealtimeListener(user.uid);
-                    } else {
-                        // User is signed out.
-                        authStatus.textContent = 'غير متصل';
-                        balanceDisplay.textContent = '0.00';
-                        userBalanceSpan.textContent = '0.00 دينار';
-                        signOutBtn.classList.add('hidden');
-                        walletBtn.classList.add('hidden');
-                        signInAnonymouslyBtn.classList.remove('hidden');
-                        emailSignInBtn.classList.remove('hidden');
-                        emailSignUpBtn.classList.remove('hidden');
-                        googleSignInBtn.classList.remove('hidden');
-                    }
-                });
+                await createUserWithEmailAndPassword(auth, email, password);
+                authModal.style.display = 'none';
+                showMessage('تم إنشاء الحساب بنجاح! مرحباً بك', '✅');
+                closeSidebar();
             } catch (error) {
-                console.error("Error initializing Firebase:", error);
-                // Even with an error, the app should continue to display,
-                // but with limited functionality.
+                console.error("Sign-up Error:", error);
+                handleAuthError(error);
+            } finally {
+                showLoader(authLoaderInModal, false);
+                authSubmitBtn.disabled = false;
             }
         }
 
-        // Sets up a real-time listener for the user's balance
+        function handleAuthError(error) {
+            let message = 'حدث خطأ في المصادقة.';
+            
+            switch(error.code) {
+                case 'auth/email-already-in-use':
+                    message = 'هذا البريد الإلكتروني مستخدم بالفعل.';
+                    break;
+                case 'auth/invalid-credential':
+                case 'auth/invalid-login-credentials':
+                case 'auth/user-not-found':
+                case 'auth/wrong-password':
+                    message = 'البريد الإلكتروني أو كلمة المرور غير صحيحة.';
+                    break;
+                case 'auth/weak-password':
+                    message = 'كلمة المرور ضعيفة جداً. يجب أن تحتوي على 6 أحرف على الأقل.';
+                    break;
+                case 'auth/invalid-email':
+                    message = 'البريد الإلكتروني غير صالح.';
+                    break;
+                case 'auth/network-request-failed':
+                    message = 'خطأ في الشبكة. يرجى التحقق من الاتصال بالإنترنت.';
+                    break;
+                case 'auth/too-many-requests':
+                    message = 'تم تجاوز عدد المحاولات المسموح. يرجى المحاولة لاحقاً.';
+                    break;
+                case 'auth/popup-closed-by-user':
+                    message = 'تم إغلاق نافذة تسجيل الدخول.';
+                    break;
+                case 'auth/cancelled-popup-request':
+                    message = 'تم إلغاء عملية تسجيل الدخول.';
+                    break;
+                case 'auth/unauthorized-domain':
+                    message = 'النطاق الحالي غير مصرح به. يرجى إضافة هذا النطاق إلى قائمة النطاقات في إعدادات Firebase Console.';
+                    break;
+                default:
+                    message = `خطأ: ${error.message}`;
+            }
+            
+            showAuthError(message);
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Auth state observer
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                let displayName = 'مستخدم مجهول';
+                if (user.displayName) {
+                    displayName = user.displayName;
+                } else if (user.email && !user.isAnonymous) {
+                    displayName = user.email.split('@')[0];
+                }
+                
+                authStatus.innerHTML = `<span class="text-green-600">متصل</span><br><small>${displayName}</small>`;
+                
+                // Show logged-in buttons, hide auth buttons
+                authButtons.classList.add('hidden');
+                loggedInButtons.classList.remove('hidden');
+                
+                setupRealtimeListener(user.uid);
+            } else {
+                authStatus.innerHTML = '<span class="text-red-500">غير متصل</span>';
+                balanceDisplay.textContent = '0.00';
+                userBalanceSpan.textContent = '0.00 دينار';
+                
+                // Show auth buttons, hide logged-in buttons
+                authButtons.classList.remove('hidden');
+                loggedInButtons.classList.add('hidden');
+                
+                watchedAds.clear();
+                updateAdCounter();
+                renderAds();
+            }
+        });
+
         function setupRealtimeListener(uid) {
             if (!uid || !db) {
                 console.error("Firebase or user not ready for listener.");
@@ -329,160 +602,178 @@
                     balanceDisplay.textContent = balance.toFixed(2);
                     userBalanceSpan.textContent = `${balance.toFixed(2)} دينار`;
                 } else {
-                    // Create the document if it doesn't exist
-                    setDoc(userDocRef, { amount: 0, lastUpdated: new Date() }).catch(e => console.error("Error creating document:", e));
+                    setDoc(userDocRef, { 
+                        amount: 0, 
+                        lastUpdated: new Date(),
+                        totalEarned: 0 
+                    }).catch(e => console.error("Error creating document:", e));
                 }
             }, (error) => {
                 console.error("Error listening to balance:", error);
             });
         }
 
-        // Updates the user's balance in Firestore
         async function updateBalance(amount) {
             if (!auth.currentUser || !db) {
-                showMessage('خطأ: المستخدم غير مسجل الدخول.');
+                showMessage('يجب تسجيل الدخول أولاً للمتابعة.', '🔐', 'warning');
                 return;
             }
 
             const userDocRef = doc(db, `artifacts/${appId}/users/${auth.currentUser.uid}/user_data/balance`);
 
             try {
-                // Get the current balance
                 const docSnap = await getDoc(userDocRef);
                 let currentBalance = 0;
                 if (docSnap.exists()) {
                     currentBalance = docSnap.data().amount || 0;
                 }
 
-                // Calculate the new balance and update the document
                 const newBalance = currentBalance + amount;
-                await setDoc(userDocRef, { amount: newBalance, lastUpdated: new Date() });
+                await setDoc(userDocRef, { 
+                    amount: newBalance, 
+                    lastUpdated: new Date(),
+                    totalEarned: (docSnap.exists() ? (docSnap.data().totalEarned || 0) : 0) + amount
+                });
 
-                showMessage(`تهانينا! لقد ربحت ${amount.toFixed(2)} دينار. رصيدك الجديد هو ${newBalance.toFixed(2)} دينار.`);
+                showMessage(`🎉 تهانينا! لقد ربحت ${amount.toFixed(2)} دينار\n💰 رصيدك الجديد: ${newBalance.toFixed(2)} دينار`, '💎');
             } catch (e) {
                 console.error("Error updating balance:", e);
-                showMessage('حدث خطأ أثناء تحديث رصيدك. يرجى المحاولة مرة أخرى.');
+                showMessage('حدث خطأ أثناء تحديث رصيدك. يرجى المحاولة مرة أخرى.', '❌', 'error');
             }
         }
 
         // --- UI Rendering and Event Listeners ---
 
-        // Renders the ad cards on the page
+        function updateAdCounter() {
+            watchedCount.textContent = watchedAds.size;
+            totalAds.textContent = ads.length;
+        }
+
         function renderAds() {
             adsContainer.innerHTML = '';
-            ads.forEach(ad => {
+            updateAdCounter();
+            
+            ads.forEach((ad, index) => {
+                const isWatched = watchedAds.has(ad.id);
                 const adCard = document.createElement('div');
-                adCard.className = "ad-card bg-white rounded-xl overflow-hidden";
+                adCard.className = `ad-card rounded-2xl overflow-hidden ${isWatched ? 'opacity-60' : ''}`;
+                adCard.style.animationDelay = `${index * 0.1}s`;
+                
                 adCard.innerHTML = `
-                    <img src="${ad.imageUrl}" alt="${ad.title}" class="w-full h-48 object-cover">
+                    <div class="relative">
+                        <img src="${ad.imageUrl}" alt="${ad.title}" class="w-full h-48 object-cover">
+                        <div class="absolute top-4 right-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-md">
+                            ${ad.reward.toFixed(2)} دينار
+                        </div>
+                    </div>
                     <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">${ad.title}</h3>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">${ad.title}</h3>
                         <p class="text-gray-600 text-sm mb-4">${ad.description}</p>
-                        <button class="watch-ad-btn bg-green-500 text-white px-4 py-2 rounded-full font-semibold w-full hover:bg-green-600 transition duration-300" data-reward="${ad.reward}">
-                            شاهد واكسب ${ad.reward.toFixed(2)} دينار
+                        <button id="ad-${ad.id}" class="btn-primary w-full text-white px-6 py-3 rounded-full font-semibold ${isWatched ? 'cursor-not-allowed opacity-50' : ''}" ${isWatched ? 'disabled' : ''}>
+                            شاهد الإعلان
                         </button>
                     </div>
                 `;
+                
                 adsContainer.appendChild(adCard);
-            });
-
-            // Attach event listeners to the new buttons
-            document.querySelectorAll('.watch-ad-btn').forEach(button => {
-                button.addEventListener('click', async (event) => {
-                    if (!auth.currentUser) {
-                        showMessage('يجب تسجيل الدخول أولاً للمتابعة.');
-                        return;
+                
+                const watchBtn = document.getElementById(`ad-${ad.id}`);
+                watchBtn.addEventListener('click', () => {
+                    if (!watchedAds.has(ad.id)) {
+                        watchedAds.add(ad.id);
+                        updateBalance(ad.reward);
+                        updateAdCounter();
+                        watchBtn.disabled = true;
+                        watchBtn.classList.add('cursor-not-allowed', 'opacity-50');
+                        adCard.classList.add('opacity-60');
+                        showMessage(`تمت إضافة ${ad.reward.toFixed(2)} دينار إلى رصيدك.`, '✅');
                     }
-
-                    const reward = parseFloat(event.target.dataset.reward);
-                    await updateBalance(reward);
                 });
             });
         }
+        
+        // Add event listener to menu button
+        menuBtn.addEventListener('click', openSidebar);
 
-        // Sidebar show/hide logic
-        menuBtn.addEventListener('click', () => {
-            sidebar.classList.add('open');
-        });
+        // Add event listeners for sidebar
+        closeBtn.addEventListener('click', closeSidebar);
+        overlay.addEventListener('click', closeSidebar);
 
-        closeBtn.addEventListener('click', () => {
-            sidebar.classList.remove('open');
-        });
-
-        // Auth button event listeners
+        // Add event listeners for auth buttons
         signInAnonymouslyBtn.addEventListener('click', async () => {
+            showLoader(anonLoader, true);
             try {
                 await signInAnonymously(auth);
-                showMessage('تم تسجيل الدخول كزائر بنجاح. يمكنك الآن مشاهدة الإعلانات.');
-                sidebar.classList.remove('open');
+                showMessage('تم تسجيل الدخول كزائر بنجاح!', '✅');
+                closeSidebar();
             } catch (error) {
                 console.error("Anonymous sign-in error:", error);
-                showMessage('فشل تسجيل الدخول كزائر. يرجى المحاولة مرة أخرى.');
+                showMessage('حدث خطأ أثناء تسجيل الدخول كزائر. يرجى المحاولة مرة أخرى.', '❌', 'error');
+            } finally {
+                showLoader(anonLoader, false);
             }
         });
 
-        emailSignInBtn.addEventListener('click', () => {
-            showAuthModal('signIn');
-        });
+        emailSignInBtn.addEventListener('click', () => showAuthModal('signIn'));
+        emailSignUpBtn.addEventListener('click', () => showAuthModal('signUp'));
 
-        emailSignUpBtn.addEventListener('click', () => {
-            showAuthModal('signUp');
-        });
-        
         googleSignInBtn.addEventListener('click', async () => {
-            const provider = new GoogleAuthProvider();
+            showLoader(googleLoader, true);
             try {
-                await signInWithPopup(auth, provider);
-                showMessage('تم تسجيل الدخول بنجاح باستخدام غوغل.');
-                sidebar.classList.remove('open');
+                await signInWithPopup(auth, googleProvider);
+                showMessage('تم تسجيل الدخول عبر غوغل بنجاح!', '✅');
+                closeSidebar();
             } catch (error) {
-                console.error("Google Sign-in error:", error);
-                let message = 'حدث خطأ في المصادقة عبر غوغل.';
-                if (error.code === 'auth/popup-closed-by-user') {
-                    message = 'تم إغلاق نافذة المصادقة. يرجى المحاولة مرة أخرى.';
-                } else if (error.code === 'auth/cancelled-by-user') {
-                    message = 'تم إلغاء عملية المصادقة.';
-                }
-                showMessage(message);
+                console.error("Google sign-in error:", error);
+                handleAuthError(error);
+            } finally {
+                showLoader(googleLoader, false);
             }
         });
 
-        // Wallet button logic (simulated withdrawal)
-        walletBtn.addEventListener('click', async () => {
-            if (!auth.currentUser) {
-                showMessage('يجب تسجيل الدخول أولاً للوصول إلى المحفظة.');
-                return;
-            }
-
-            const currentBalance = parseFloat(balanceDisplay.textContent);
-            if (currentBalance >= 100) {
-                // This is a simplified, simulated withdrawal process.
-                // In a real application, this would involve external payment APIs.
-                const userDocRef = doc(db, `artifacts/${appId}/users/${auth.currentUser.uid}/user_data/balance`);
-                await setDoc(userDocRef, { amount: currentBalance - 100, lastUpdated: new Date() });
-                showMessage(`تمت محاكاة سحب 100 دينار بنجاح. رصيدك المتبقي هو ${ (currentBalance - 100).toFixed(2) } دينار.`);
-            } else {
-                showMessage(`رصيدك الحالي هو ${currentBalance.toFixed(2)} دينار. يجب أن يبلغ رصيدك 100 دينار على الأقل لإجراء عملية السحب.`);
-            }
-        });
-
-        // Sign out logic
         signOutBtn.addEventListener('click', async () => {
             try {
                 await signOut(auth);
-                showMessage('تم تسجيل خروجك بنجاح.');
-                sidebar.classList.remove('open');
+                showMessage('تم تسجيل الخروج بنجاح. نراك قريباً!', '👋');
+                closeSidebar();
             } catch (error) {
                 console.error("Sign out error:", error);
-                showMessage('فشل تسجيل الخروج.');
+                showMessage('حدث خطأ أثناء تسجيل الخروج. يرجى المحاولة مرة أخرى.', '❌', 'error');
             }
         });
 
-        // --- Initial app load ---
-        window.onload = () => {
-            initializeFirebase();
-            renderAds();
-        };
+        modalCloseButton.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        authModalCloseBtn.addEventListener('click', () => {
+            authModal.style.display = 'none';
+        });
+
+        // Initialize and render
+        renderAds();
+        
+        // This is a dummy function and should not be used in production
+        // It's for demonstration purposes to show the wallet functionality
+        walletBtn.addEventListener('click', () => {
+            showMessage("هذه ميزة المحفظة. يمكنك هنا إدارة رصيدك وتحويل الأموال.", '💼', 'info');
+        });
+
+        // Add event listener for the menu button
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuButton = document.getElementById('menuBtn');
+            const sidebarElement = document.getElementById('sidebar');
+            const closeButton = document.getElementById('closeBtn');
+            
+            menuButton.addEventListener('click', () => {
+                sidebarElement.classList.add('open');
+            });
+            
+            closeButton.addEventListener('click', () => {
+                sidebarElement.classList.remove('open');
+            });
+        });
+        
     </script>
 </body>
 </html>

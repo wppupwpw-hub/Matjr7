@@ -233,35 +233,28 @@
 
     <!-- Firebase CDN -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-
-        // Enable debug logging for Firebase Firestore
-        setLogLevel('debug');
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Global variables with fallbacks for Canvas environment
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'demo-ads-app';
-        
-        let firebaseConfig = {
-          apiKey: "AIzaSyBSnEYXXUHIbfqW07p0vmtbVDyUH1Um3_g",
-          authDomain: "miv00-63ca2.firebaseapp.com",
-          projectId: "miv00-63ca2",
-          storageBucket: "miv00-63ca2.firebasestorage.app",
-          messagingSenderId: "949781550299",
-          appId: "1:949781550299:web:06b1ec7ee16e53494728fe",
-          measurementId: "G-Q4BNYEY4M1"
-        };
-        
-        // This is a special Firebase config provided by the environment
+        let firebaseConfig = null;
         if (typeof __firebase_config !== 'undefined') {
-          try {
-            const externalConfig = JSON.parse(__firebase_config);
-            firebaseConfig = { ...firebaseConfig, ...externalConfig };
-          } catch(e) {
-            console.error("Error parsing __firebase_config:", e);
-          }
+            try {
+                firebaseConfig = JSON.parse(__firebase_config);
+            } catch(e) {
+                console.error("Error parsing __firebase_config:", e);
+                // Fallback to a default config if parsing fails
+                firebaseConfig = {
+                    apiKey: "AIzaSyBSnEYXXUHIbfqW07p0vmtbVDyUH1Um3_g",
+                    authDomain: "miv00-63ca2.firebaseapp.com",
+                    projectId: "miv00-63ca2",
+                    storageBucket: "miv00-63ca2.firebasestorage.app",
+                    messagingSenderId: "949781550299",
+                    appId: "1:949781550299:web:06b1ec7ee16e53494728fe"
+                };
+            }
         }
         
         const app = initializeApp(firebaseConfig);
@@ -274,7 +267,8 @@
         });
 
         let watchedAds = new Set();
-        
+        let currentUser = null;
+        let userBalance = 0;
 
         // Get UI elements
         const menuBtn = document.getElementById('menuBtn');
@@ -540,10 +534,10 @@
                     message = 'تم إلغاء عملية تسجيل الدخول.';
                     break;
                 case 'auth/unauthorized-domain':
-                    message = 'النطاق الحالي غير مصرح به. يرجى إضافة هذا النطاق إلى قائمة النطاقات في إعدادات Firebase Console.';
+                    message = 'النطاق الحالي غير مصرح به للمصادقة.';
                     break;
                 case 'auth/operation-not-allowed':
-                    message = 'عملية المصادقة غير مفعلة. يرجى تفعيل تسجيل الدخول عبر Google أو البريد الإلكتروني في إعدادات Firebase.';
+                    message = 'عملية المصادقة غير مفعلة.';
                     break;
                 default:
                     message = `خطأ: ${error.message}`;
@@ -557,225 +551,190 @@
             return emailRegex.test(email);
         }
 
-        // Auth state observer
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                let displayName = 'مستخدم مجهول';
-                if (user.displayName) {
-                    displayName = user.displayName;
-                } else if (user.email && !user.isAnonymous) {
-                    displayName = user.email.split('@')[0];
-                }
-                
-                authStatus.innerHTML = `<span class="text-green-600">متصل</span><br><small>${displayName}</small>`;
-                
-                // Show logged-in buttons, hide auth buttons
-                authButtons.classList.add('hidden');
-                loggedInButtons.classList.remove('hidden');
-                
-                setupRealtimeListener(user.uid);
-            } else {
-                authStatus.innerHTML = '<span class="text-red-500">غير متصل</span>';
-                balanceDisplay.textContent = '0.00';
-                userBalanceSpan.textContent = '0.00 دينار';
-                
-                // Show auth buttons, hide logged-in buttons
-                authButtons.classList.remove('hidden');
-                loggedInButtons.classList.add('hidden');
-                
-                watchedAds.clear();
-                updateAdCounter();
-                renderAds();
-            }
-        });
-
-        function setupRealtimeListener(uid) {
-            if (!uid || !db) {
-                console.error("Firebase or user not ready for listener.");
-                return;
-            }
-
-            const userDocRef = doc(db, `artifacts/${appId}/users/${uid}/user_data/balance`);
-
-            onSnapshot(userDocRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    const balance = data.amount || 0;
-                    balanceDisplay.textContent = balance.toFixed(2);
-                    userBalanceSpan.textContent = `${balance.toFixed(2)} دينار`;
-                } else {
-                    setDoc(userDocRef, { 
-                        amount: 0, 
-                        lastUpdated: new Date(),
-                        totalEarned: 0 
-                    }).catch(e => console.error("Error creating document:", e));
-                }
-            }, (error) => {
-                console.error("Error listening to balance:", error);
-            });
+        function updateUIBalance(balance) {
+            userBalance = balance;
+            balanceDisplay.textContent = balance.toFixed(2);
+            userBalanceSpan.textContent = `${balance.toFixed(2)} دينار`;
         }
 
-        async function updateBalance(amount) {
-            if (!auth.currentUser || !db) {
-                showMessage('يجب تسجيل الدخول أولاً للمتابعة.', '🔐', 'warning');
-                return;
-            }
-
-            const userDocRef = doc(db, `artifacts/${appId}/users/${auth.currentUser.uid}/user_data/balance`);
+        async function loadUserBalance() {
+            if (!currentUser || !db) return;
 
             try {
+                const userDocRef = doc(db, `artifacts/${appId}/users/${currentUser.uid}/profile/data`);
                 const docSnap = await getDoc(userDocRef);
-                let currentBalance = 0;
+                
                 if (docSnap.exists()) {
-                    currentBalance = docSnap.data().amount || 0;
+                    const data = docSnap.data();
+                    const balance = data.balance || 0;
+                    const watchedAdIds = data.watchedAds || [];
+                    
+                    updateUIBalance(balance);
+                    
+                    // Update watched ads
+                    watchedAds = new Set(watchedAdIds);
+                    updateAdCounter();
+                    renderAds();
+                } else {
+                    // Create new user document
+                    await setDoc(userDocRef, {
+                        balance: 0,
+                        watchedAds: [],
+                        totalEarned: 0,
+                        createdAt: new Date(),
+                        lastUpdated: new Date()
+                    });
+                    updateUIBalance(0);
                 }
+            } catch (error) {
+                console.error("Error loading user data:", error);
+                showMessage('حدث خطأ أثناء تحميل بياناتك.', '❌', 'error');
+            }
+        }
+        
+        async function watchAd(adId, reward) {
+            if (!currentUser) {
+                showMessage('يجب عليك تسجيل الدخول أولاً للمشاهدة.', '🔒', 'warning');
+                return;
+            }
+            
+            if (watchedAds.has(adId)) {
+                showMessage('لقد شاهدت هذا الإعلان بالفعل.', '⚠️', 'warning');
+                return;
+            }
 
-                const newBalance = currentBalance + amount;
-                await setDoc(userDocRef, { 
-                    amount: newBalance, 
-                    lastUpdated: new Date(),
-                    totalEarned: (docSnap.exists() ? (docSnap.data().totalEarned || 0) : 0) + amount
+            try {
+                const userDocRef = doc(db, `artifacts/${appId}/users/${currentUser.uid}/profile/data`);
+                await updateDoc(userDocRef, {
+                    balance: increment(reward),
+                    watchedAds: [...watchedAds, adId]
                 });
-
-                showMessage(`🎉 تهانينا! لقد ربحت ${amount.toFixed(2)} دينار\n💰 رصيدك الجديد: ${newBalance.toFixed(2)} دينار`, '💎');
-            } catch (e) {
-                console.error("Error updating balance:", e);
-                showMessage('حدث خطأ أثناء تحديث رصيدك. يرجى المحاولة مرة أخرى.', '❌', 'error');
+                
+                watchedAds.add(adId);
+                updateUIBalance(userBalance + reward);
+                updateAdCounter();
+                
+                showMessage(`تهانينا! لقد ربحت ${reward.toFixed(2)} دينار.`, '🎉');
+                renderAds(); // Re-render to update UI state
+            } catch (error) {
+                console.error("Error updating balance:", error);
+                showMessage('حدث خطأ أثناء إضافة الرصيد. حاول مرة أخرى.', '❌', 'error');
             }
         }
 
-        // --- UI Rendering and Event Listeners ---
+        function renderAds() {
+            adsContainer.innerHTML = ''; // Clear previous ads
+            ads.forEach(ad => {
+                const isWatched = watchedAds.has(ad.id);
+                const adHtml = `
+                    <div class="ad-card rounded-2xl p-6 shadow-lg relative ${isWatched ? 'opacity-50' : ''}">
+                        <div class="absolute top-4 left-4 z-10 bg-purple-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md">
+                            ${ad.category}
+                        </div>
+                        <img src="${ad.imageUrl}" alt="${ad.title}" class="w-full h-48 object-cover rounded-xl mb-4 shadow-sm">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-xl font-bold text-gray-800">${ad.title}</h3>
+                            <span class="text-lg font-bold text-green-500">${ad.reward.toFixed(2)} د.</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-4">${ad.description}</p>
+                        <button class="w-full btn-primary text-white py-3 rounded-xl font-semibold transition duration-300 transform ${isWatched ? 'opacity-50 cursor-not-allowed' : ''}" 
+                                onclick="watchAd(${ad.id}, ${ad.reward})"
+                                ${isWatched ? 'disabled' : ''}>
+                            <i class="fas fa-play ml-2"></i> شاهد الإعلان
+                        </button>
+                    </div>
+                `;
+                adsContainer.innerHTML += adHtml;
+            });
+            updateAdCounter();
+        }
 
         function updateAdCounter() {
             watchedCount.textContent = watchedAds.size;
             totalAds.textContent = ads.length;
         }
 
-        function renderAds() {
-            adsContainer.innerHTML = '';
-            updateAdCounter();
-            
-            ads.forEach((ad, index) => {
-                const isWatched = watchedAds.has(ad.id);
-                const adCard = document.createElement('div');
-                adCard.className = `ad-card rounded-2xl overflow-hidden ${isWatched ? 'opacity-60' : ''}`;
-                adCard.style.animationDelay = `${index * 0.1}s`;
-                
-                adCard.innerHTML = `
-                    <div class="relative">
-                        <img src="${ad.imageUrl}" alt="${ad.title}" class="w-full h-48 object-cover">
-                        <div class="absolute top-4 right-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-md">
-                            ${ad.reward.toFixed(2)} دينار
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">${ad.title}</h3>
-                        <p class="text-gray-600 text-sm mb-4">${ad.description}</p>
-                        <button id="ad-${ad.id}" class="btn-primary w-full text-white px-6 py-3 rounded-full font-semibold ${isWatched ? 'cursor-not-allowed opacity-50' : ''}" ${isWatched ? 'disabled' : ''}>
-                            شاهد الإعلان
-                        </button>
-                    </div>
-                `;
-                
-                adsContainer.appendChild(adCard);
-                
-                const watchBtn = document.getElementById(`ad-${ad.id}`);
-                watchBtn.addEventListener('click', () => {
-                    if (!watchedAds.has(ad.id)) {
-                        watchedAds.add(ad.id);
-                        updateBalance(ad.reward);
-                        updateAdCounter();
-                        watchBtn.disabled = true;
-                        watchBtn.classList.add('cursor-not-allowed', 'opacity-50');
-                        adCard.classList.add('opacity-60');
-                        showMessage(`تمت إضافة ${ad.reward.toFixed(2)} دينار إلى رصيدك.`, '✅');
-                    }
-                });
-            });
-        }
-        
-        // Add event listener to menu button
+        // --- Event Listeners ---
         menuBtn.addEventListener('click', openSidebar);
-
-        // Add event listeners for sidebar
         closeBtn.addEventListener('click', closeSidebar);
-        overlay.addEventListener('click', closeSidebar);
-
-        // Add event listeners for auth buttons
+        modalCloseButton.addEventListener('click', () => modal.style.display = 'none');
+        authModalCloseBtn.addEventListener('click', () => authModal.style.display = 'none');
+        emailSignInBtn.addEventListener('click', () => showAuthModal('signIn'));
+        emailSignUpBtn.addEventListener('click', () => showAuthModal('signUp'));
+        
         signInAnonymouslyBtn.addEventListener('click', async () => {
             showLoader(anonLoader, true);
+            signInAnonymouslyBtn.disabled = true;
             try {
                 await signInAnonymously(auth);
                 showMessage('تم تسجيل الدخول كزائر بنجاح!', '✅');
                 closeSidebar();
             } catch (error) {
-                console.error("Anonymous sign-in error:", error);
-                showMessage('حدث خطأ أثناء تسجيل الدخول كزائر. يرجى المحاولة مرة أخرى.', '❌', 'error');
+                console.error("Anonymous Sign-in Error:", error);
+                showMessage('فشل تسجيل الدخول كزائر.', '❌', 'error');
             } finally {
                 showLoader(anonLoader, false);
+                signInAnonymouslyBtn.disabled = false;
             }
         });
-
-        emailSignInBtn.addEventListener('click', () => showAuthModal('signIn'));
-        emailSignUpBtn.addEventListener('click', () => showAuthModal('signUp'));
-
+        
         googleSignInBtn.addEventListener('click', async () => {
             showLoader(googleLoader, true);
+            googleSignInBtn.disabled = true;
             try {
                 await signInWithPopup(auth, googleProvider);
                 showMessage('تم تسجيل الدخول عبر غوغل بنجاح!', '✅');
                 closeSidebar();
             } catch (error) {
-                console.error("Google sign-in error:", error);
+                console.error("Google Sign-in Error:", error);
                 handleAuthError(error);
             } finally {
                 showLoader(googleLoader, false);
+                googleSignInBtn.disabled = false;
             }
         });
-
+        
         signOutBtn.addEventListener('click', async () => {
             try {
                 await signOut(auth);
-                showMessage('تم تسجيل الخروج بنجاح. نراك قريباً!', '👋');
-                closeSidebar();
+                watchedAds.clear();
+                updateUIBalance(0);
+                updateAdCounter();
+                renderAds();
+                showMessage('تم تسجيل الخروج بنجاح.', '🚪');
             } catch (error) {
-                console.error("Sign out error:", error);
-                showMessage('حدث خطأ أثناء تسجيل الخروج. يرجى المحاولة مرة أخرى.', '❌', 'error');
+                console.error("Sign-out Error:", error);
+                showMessage('حدث خطأ أثناء تسجيل الخروج.', '❌', 'error');
             }
         });
 
-        modalCloseButton.addEventListener('click', () => {
-            modal.style.display = 'none';
+        // --- Firebase Auth State Listener ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                authStatus.textContent = user.isAnonymous ? 'زائر' : user.email || 'متصل';
+                authButtons.classList.add('hidden');
+                loggedInButtons.classList.remove('hidden');
+                await loadUserBalance();
+            } else {
+                currentUser = null;
+                authStatus.textContent = 'غير متصل';
+                authButtons.classList.remove('hidden');
+                loggedInButtons.classList.add('hidden');
+                updateUIBalance(0);
+                watchedAds.clear();
+                renderAds(); // Reset UI
+            }
         });
-
-        authModalCloseBtn.addEventListener('click', () => {
-            authModal.style.display = 'none';
-        });
-
-        // Initialize and render
-        renderAds();
         
-        // This is a dummy function and should not be used in production
-        // It's for demonstration purposes to show the wallet functionality
-        walletBtn.addEventListener('click', () => {
-            showMessage("هذه ميزة المحفظة. يمكنك هنا إدارة رصيدك وتحويل الأموال.", '💼', 'info');
-        });
-
-        // Add event listener for the menu button
+        // Initial rendering on page load
         document.addEventListener('DOMContentLoaded', () => {
-            const menuButton = document.getElementById('menuBtn');
-            const sidebarElement = document.getElementById('sidebar');
-            const closeButton = document.getElementById('closeBtn');
-            
-            menuButton.addEventListener('click', () => {
-                sidebarElement.classList.add('open');
-            });
-            
-            closeButton.addEventListener('click', () => {
-                sidebarElement.classList.remove('open');
-            });
+            renderAds();
         });
         
+        // Expose functions to the global scope for HTML events
+        window.watchAd = watchAd;
+        window.closeSidebar = closeSidebar;
     </script>
 </body>
 </html>

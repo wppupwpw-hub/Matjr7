@@ -663,58 +663,74 @@
         }
 
         // --- Event Listeners ---
-        menuBtn.addEventListener('click', openSidebar);
-        closeBtn.addEventListener('click', closeSidebar);
-        overlay.addEventListener('click', closeSidebar); // Close sidebar when clicking overlay
-        modalCloseButton.addEventListener('click', () => modal.style.display = 'none');
-        authModalCloseBtn.addEventListener('click', () => authModal.style.display = 'none');
-        emailSignInBtn.addEventListener('click', () => showAuthModal('signIn'));
-        emailSignUpBtn.addEventListener('click', () => showAuthModal('signUp'));
-        
-        signInAnonymouslyBtn.addEventListener('click', async () => {
-            showLoader(anonLoader, true);
-            signInAnonymouslyBtn.disabled = true;
-            try {
-                await signInAnonymously(auth);
-                showMessage('تم تسجيل الدخول كزائر بنجاح!', '✅');
-                closeSidebar();
-            } catch (error) {
-                console.error("Anonymous Sign-in Error:", error);
-                showMessage('فشل تسجيل الدخول كزائر.', '❌', 'error');
-            } finally {
-                showLoader(anonLoader, false);
-                signInAnonymouslyBtn.disabled = false;
-            }
-        });
-        
-        googleSignInBtn.addEventListener('click', async () => {
-            showLoader(googleLoader, true);
-            googleSignInBtn.disabled = true;
-            try {
-                await signInWithPopup(auth, googleProvider);
-                showMessage('تم تسجيل الدخول عبر غوغل بنجاح!', '✅');
-                closeSidebar();
-            } catch (error) {
-                console.error("Google Sign-in Error:", error);
-                handleAuthError(error);
-            } finally {
-                showLoader(googleLoader, false);
-                googleSignInBtn.disabled = false;
-            }
-        });
-        
-        signOutBtn.addEventListener('click', async () => {
-            try {
-                await signOut(auth);
-                watchedAds.clear();
-                updateUIBalance(0);
-                updateAdCounter();
-                renderAds();
-                showMessage('تم تسجيل الخروج بنجاح.', '🚪');
-            } catch (error) {
-                console.error("Sign-out Error:", error);
-                showMessage('حدث خطأ أثناء تسجيل الخروج.', '❌', 'error');
-            }
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get UI elements
+            const menuBtn = document.getElementById('menuBtn');
+            const sidebar = document.getElementById('sidebar');
+            const closeBtn = document.getElementById('closeBtn');
+            const overlay = document.getElementById('overlay');
+            const modalCloseButton = document.getElementById('modalCloseButton');
+            const authModalCloseBtn = document.getElementById('authModalCloseBtn');
+            const emailSignInBtn = document.getElementById('emailSignInBtn');
+            const emailSignUpBtn = document.getElementById('emailSignUpBtn');
+            const signInAnonymouslyBtn = document.getElementById('signInAnonymouslyBtn');
+            const googleSignInBtn = document.getElementById('googleSignInBtn');
+            const signOutBtn = document.getElementById('signOutBtn');
+
+            menuBtn.addEventListener('click', openSidebar);
+            closeBtn.addEventListener('click', closeSidebar);
+            overlay.addEventListener('click', closeSidebar); // Close sidebar when clicking overlay
+            modalCloseButton.addEventListener('click', () => modal.style.display = 'none');
+            authModalCloseBtn.addEventListener('click', () => authModal.style.display = 'none');
+            emailSignInBtn.addEventListener('click', () => showAuthModal('signIn'));
+            emailSignUpBtn.addEventListener('click', () => showAuthModal('signUp'));
+            
+            signInAnonymouslyBtn.addEventListener('click', async () => {
+                showLoader(anonLoader, true);
+                signInAnonymouslyBtn.disabled = true;
+                try {
+                    await signInAnonymously(auth);
+                    showMessage('تم تسجيل الدخول كزائر بنجاح!', '✅');
+                    closeSidebar();
+                } catch (error) {
+                    console.error("Anonymous Sign-in Error:", error);
+                    showMessage('فشل تسجيل الدخول كزائر.', '❌', 'error');
+                } finally {
+                    showLoader(anonLoader, false);
+                    signInAnonymouslyBtn.disabled = false;
+                }
+            });
+            
+            googleSignInBtn.addEventListener('click', async () => {
+                showLoader(googleLoader, true);
+                googleSignInBtn.disabled = true;
+                try {
+                    await signInWithPopup(auth, googleProvider);
+                    showMessage('تم تسجيل الدخول عبر غوغل بنجاح!', '✅');
+                    closeSidebar();
+                } catch (error) {
+                    console.error("Google Sign-in Error:", error);
+                    handleAuthError(error);
+                } finally {
+                    showLoader(googleLoader, false);
+                    googleSignInBtn.disabled = false;
+                }
+            });
+            
+            signOutBtn.addEventListener('click', async () => {
+                try {
+                    await signOut(auth);
+                    watchedAds.clear();
+                    updateUIBalance(0);
+                    updateAdCounter();
+                    renderAds();
+                    showMessage('تم تسجيل الخروج بنجاح.', '🚪');
+                } catch (error) {
+                    console.error("Sign-out Error:", error);
+                    showMessage('حدث خطأ أثناء تسجيل الخروج.', '❌', 'error');
+                }
+            });
+            renderAds();
         });
 
         // --- Firebase Auth State Listener ---
@@ -734,11 +750,6 @@
                 watchedAds.clear();
                 renderAds(); // Reset UI
             }
-        });
-        
-        // Initial rendering on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            renderAds();
         });
     </script>
 </body>

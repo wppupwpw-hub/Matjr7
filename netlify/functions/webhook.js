@@ -130,8 +130,20 @@ async function handleMessagingEvent(webhookEvent) {
             const userMsg = webhookEvent.message.text.trim().toLowerCase();
             console.log("📩 User message:", userMsg);
             
-            // Generate response from the loaded data
-            const botResponse = responsesData[userMsg] || "عذراً، لم أجد إجابة لهذا السؤال. حاول صياغة السؤال بشكل مختلف.";
+            // Generate response from the loaded data using keyword matching
+            let botResponse = "عذراً، لم أجد إجابة لهذا السؤال. حاول صياغة السؤال بشكل مختلف.";
+            let bestMatch = null;
+
+            for (const question in responsesData) {
+                if (userMsg.includes(question) && (!bestMatch || question.length > bestMatch.length)) {
+                    bestMatch = question;
+                }
+            }
+
+            if (bestMatch) {
+                botResponse = responsesData[bestMatch];
+            }
+            
             await sendMessage(senderId, botResponse);
         } else if (webhookEvent.postback?.payload === "GET_STARTED_PAYLOAD") {
             const welcomeText = "مرحباً بك! أنا مساعدك الذكي. اسألني عن أي شيء.";

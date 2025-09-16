@@ -8,13 +8,16 @@ const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 
 // Path to the optimized JSON file, now in the same directory as the function
 const RESPONSES_FILE = path.resolve(__dirname, 'responses_optimized.json');
-let responsesData = {};
+let responsesData = null;
 
 /**
  * Load the optimized responses data from the JSON file.
- * This function handles the new file structure with keyword indexing.
  */
 async function loadResponses() {
+    if (responsesData) {
+        return;
+    }
+
     try {
         if (!fs.existsSync(RESPONSES_FILE)) {
             console.error("❌ responses_optimized.json file not found. Please ensure it's in the correct directory.");
@@ -32,12 +35,8 @@ async function loadResponses() {
     }
 }
 
-// Load responses on startup
-loadResponses();
-
-/**
- * Main Webhook handler function
- */
+// Load responses on every new function invocation
+// This is to ensure the latest data is used
 exports.handler = async (event) => {
     // Check for required environment variables
     if (!VERIFY_TOKEN || !PAGE_ACCESS_TOKEN) {
@@ -48,6 +47,8 @@ exports.handler = async (event) => {
     }
 
     try {
+        await loadResponses();
+
         // Verification for Facebook (GET request)
         if (event.httpMethod === "GET") {
             const params = event.queryStringParameters || {};
@@ -117,6 +118,11 @@ async function handleMessagingEvent(webhookEvent) {
         if (webhookEvent.message?.text) {
             const userMsg = webhookEvent.message.text.trim().toLowerCase();
             console.log("📩 User message:", userMsg);
+
+            if (!responsesData) {
+                 await sendMessage(senderId, "عذراً، لم أستطع تحميل قاعدة البيانات. حاول مرة أخرى.");
+                 return;
+            }
             
             // Search for the best response using keyword matching from the optimized data
             let botResponse = "عذراً، لم أجد إجابة لهذا السؤال. حاول صياغة السؤال بشكل مختلف.";

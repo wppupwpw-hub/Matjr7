@@ -493,10 +493,14 @@ def create_optimized_webhook_data():
             question_id += 1
 
     optimized_data["statistics"]["total_questions"] = question_id - 1
+    
+    # Check if the directory 'netlify/functions' exists, if not, create it
+    # This is a safety measure to prevent errors
+    output_dir = 'netlify/functions'
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
 
-    # Update the file path to save the generated file in the correct functions directory
-    # This is critical for Netlify to publish the file with the function
-    with open('netlify/functions/responses_optimized.json', 'w', encoding='utf-8') as f:
+    with open(os.path.join(output_dir, 'responses_optimized.json'), 'w', encoding='utf-8') as f:
         json.dump(optimized_data, f, ensure_ascii=False, indent=2)
 
     print(f"✅ تم إنشاء ملف JSON محسّن: responses_optimized.json")

@@ -3,10 +3,7 @@
   command = "python qa_generator_arrays.py && echo 'Running Python script to generate responses file...'"
   publish = "netlify/functions"
 
-[build.environment]
-  # يمكن إضافة أي متغيرات بيئة هنا إذا لزم الأمر
-  PYTHON_VERSION = "3.9"
-
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
+  included_files = ["./responses_optimized.json"]

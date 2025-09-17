@@ -28,9 +28,12 @@ async function loadResponsesFromFiles() {
     isLoading = true;
     console.log("🔍 Looking for response files...");
     
+    // Get the functions directory path
+    const functionsDir = __dirname;
+
     // Try each possible file
     for (const fileName of RESPONSE_FILES) {
-        const filePath = path.resolve(__dirname, fileName);
+        const filePath = path.join(functionsDir, fileName);
         
         try {
             if (fs.existsSync(filePath)) {
@@ -90,7 +93,13 @@ async function loadResponsesFromFiles() {
     }
     
     console.log("❌ No valid response files found!");
-    console.log("📂 Files in directory:", fs.readdirSync(__dirname));
+    
+    // Log available files in the directory for debugging
+    try {
+        console.log("📂 Files in directory:", fs.readdirSync(functionsDir));
+    } catch (e) {
+        console.log("❌ Could not read directory:", e.message);
+    }
     
     responsesData = null;
     isLoading = false;

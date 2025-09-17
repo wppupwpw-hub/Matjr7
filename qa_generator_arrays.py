@@ -360,23 +360,23 @@ def generate_single_array_data(array_size):
                     question = f"متى اخترع {value} {key}؟"
                     answer = f"{value} هو مخترع {key} 🔬"
                 elif category == "definitions":
-                    question = f"ما هي أهمية {}؟"
-                    answer = f"{} مهم لأنه {value} 🧠"
+                    question = f"ما هي أهمية {key}؟"
+                    answer = f"{key} مهم لأنه {value} 🧠"
                 elif category == "sports":
                     question = f"ما هي جنسية الفائز بـ{key}؟"
                     answer = f"الفائز بـ{key} هو {value} 🏆"
                 elif category == "records":
                     question = f"أين يقع {key}؟"
-                    answer = f"{} يقع في {} 🌍"
+                    answer = f"{key} يقع في {value} 🌍"
                 elif category == "people":
                     question = f"ما هو أهم إنجاز لـ{key}؟"
                     answer = f"أهم إنجاز لـ{key} هو {value} 👨‍💼"
                 elif category == "colors":
-                    question = f"ما هي الألوان التي تتكون منها {}؟"
-                    answer = f"اللون {} يتكون من {value} 🎨"
+                    question = f"ما هي الألوان التي تتكون منها {key}؟"
+                    answer = f"اللون {key} يتكون من {value} 🎨"
                 elif category == "animals":
-                    question = f"أين يعيش {}؟"
-                    answer = f"{} يعيش في {value} 🐾"
+                    question = f"أين يعيش {key}؟"
+                    answer = f"{key} يعيش في {value} 🐾"
 
             if 'answer' not in locals():
                 if category == "capitals":
@@ -443,7 +443,7 @@ def generate_arrays_data():
     return arrays_data
 
 def create_optimized_webhook_data():
-    print("🔧 إنشاء ملف JSON محسن للويب هوك...")
+    print("🔧 إنشاء ملف JSON محسّن للويب هوك...")
     arrays_data = generate_arrays_data()
     
     optimized_data = {
